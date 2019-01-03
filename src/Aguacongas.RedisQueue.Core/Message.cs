@@ -4,9 +4,9 @@ namespace Aguacongas.RedisQueue
 {
     public class Message
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        public string QueueNane { get; set; }
+        public string QueueName { get; set; }
         public DateTimeOffset Created { get; set; }
 
         public string InitiatorToken { get; set; }

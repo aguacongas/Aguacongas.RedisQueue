@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aguacongas.RedisQueue", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aguacongas.RedisQueue.Core", "src\Aguacongas.RedisQueue.Core\Aguacongas.RedisQueue.Core.csproj", "{8D76E516-EFCB-4376-BEAD-15BA1688B534}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{CC32E007-F562-4CAF-A60F-5B1CE7EF5C01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aguacongas.RedisQueue.Core.IntegrationTest", "test\Aguacongas.RedisQueue.Core.IntegrationTest\Aguacongas.RedisQueue.Core.IntegrationTest.csproj", "{A8F2475A-E835-401F-B6B0-04E65E5BF458}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,18 @@ Global
 		{8D76E516-EFCB-4376-BEAD-15BA1688B534}.Release|x64.Build.0 = Release|Any CPU
 		{8D76E516-EFCB-4376-BEAD-15BA1688B534}.Release|x86.ActiveCfg = Release|Any CPU
 		{8D76E516-EFCB-4376-BEAD-15BA1688B534}.Release|x86.Build.0 = Release|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Debug|x64.Build.0 = Debug|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Debug|x86.Build.0 = Debug|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Release|x64.ActiveCfg = Release|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Release|x64.Build.0 = Release|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Release|x86.ActiveCfg = Release|Any CPU
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +66,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3FF0A978-8173-4572-A5A5-64D3ED9878F3} = {CCEF89D6-C46A-4DAE-B628-539DE25145B5}
 		{8D76E516-EFCB-4376-BEAD-15BA1688B534} = {CCEF89D6-C46A-4DAE-B628-539DE25145B5}
+		{A8F2475A-E835-401F-B6B0-04E65E5BF458} = {CC32E007-F562-4CAF-A60F-5B1CE7EF5C01}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A26D67C2-4107-42C8-8517-0C7BB4E59ABA}

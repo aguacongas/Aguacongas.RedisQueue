@@ -42,8 +42,8 @@ namespace Aguacongas.RedisQueue
             var transaction = _database.CreateTransaction();
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            transaction.ListRightPushAsync("queue/" + message.QueueNane, message.Id.ToString());
-            transaction.HashSetAsync("data/" + message.QueueNane, message.Id.ToString(), _serilizer.Serialize(message));
+            transaction.ListRightPushAsync("queue/" + message.QueueName, message.Id.ToString());
+            transaction.HashSetAsync("data/" + message.QueueName, message.Id.ToString(), _serilizer.Serialize(message));
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
             await transaction.ExecuteAsync();
@@ -51,7 +51,7 @@ namespace Aguacongas.RedisQueue
 
         public Task<Message> Get(Guid id, string queueName)
         {
-            return Get(id.ToString(), queueName);
+            return Get(queueName, id.ToString());
         }
 
         public async Task<IEnumerable<Guid>> GetKeys(string queueName)
@@ -60,23 +60,21 @@ namespace Aguacongas.RedisQueue
             return GetIds(ids, queueName);
         }
 
-        public Task Remove(Guid id, string queueName)
-        {
-            return _database.HashDeleteAsync("data/" + queueName, id.ToString());
-        }
-
         public async Task<Message> Pop(string fromQueueName)
         {
             string id = await _database.ListLeftPopAsync("queue/" + fromQueueName);
             var message = await Get(fromQueueName, id);
-            await _database.HashDeleteAsync("data/" + fromQueueName, id);
+            if (message != null)
+            {
+                await _database.HashDeleteAsync("data/" + fromQueueName, id);
+            }
             return message;
         }
 
         public async Task<Message> Peek(string fromQueueName)
         {
             var id = await _database.ListGetByIndexAsync("queue/" + fromQueueName, 0);
-            return await Get(id, fromQueueName);
+            return await Get(fromQueueName, id);
         }
 
         private async Task<Message> Get(string fromQueueName, string id)

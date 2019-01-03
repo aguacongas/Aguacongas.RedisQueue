@@ -11,9 +11,6 @@ namespace Aguacongas.RedisQueue
         Task Push(Message message);
 
         Task<Message> Get(Guid id, string queueName);
-
-        Task Remove(Guid id, string queueName);
-
         Task<IEnumerable<Guid>> GetKeys(string queueName);
         Task<Message> Pop(string fromQueueName);
         Task<Message> Peek(string fromQueueName);

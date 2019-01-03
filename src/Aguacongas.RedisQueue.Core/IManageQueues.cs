@@ -12,18 +12,6 @@ namespace Aguacongas.RedisQueue
     public interface IManageQueues
     {
         /// <summary>
-        /// Enqueues the specified to queue.
-        /// </summary>
-        /// <param name="address">
-        /// Address of the queue. (https://host/queuename or queuename)
-        /// </param>
-        /// <param name="payload">
-        /// The serialized message.
-        /// </param>
-        /// <returns>The message id</returns>
-        Task<Guid> Enqueue(string address, string payload);
-
-        /// <summary>
         /// Enqueues the specified localy.
         /// </summary>
         /// <param name="message">
@@ -33,7 +21,7 @@ namespace Aguacongas.RedisQueue
         /// <remarks>
         /// For internal use, this method should not me call by your code
         /// </remarks>
-        Task Enqueue(Message message);
+        Task EnqueueAsync(Message message);
 
         /// <summary>
         ///   Dequeues the specified from queue.
@@ -42,7 +30,7 @@ namespace Aguacongas.RedisQueue
         ///   Name of from queue.
         /// </param>
         /// <returns>The first message in queue or null</returns>
-        Task<Message> Dequeue(string fromQueueName);
+        Task<Message> DequeueAsync(string fromQueueName);
 
         /// <summary>
         ///   Peeks the specified from queue.
@@ -53,7 +41,7 @@ namespace Aguacongas.RedisQueue
         /// <returns>
         ///   The first message in queue or null
         /// </returns>
-        Task<Message> Peek(string fromQueueName);
+        Task<Message> PeekAsync(string fromQueueName);
 
         /// <summary>
         ///   Get the specified from queue.
@@ -67,7 +55,7 @@ namespace Aguacongas.RedisQueue
         /// <returns>
         ///   The data at id or null
         /// </returns>
-        Task<Message> Get(Guid id, string fromQueueName);
+        Task<Message> GetAsync(Guid id, string fromQueueName);
 
         /// <summary>
         ///   Gets the number of message in a queue.
@@ -76,7 +64,7 @@ namespace Aguacongas.RedisQueue
         ///   Name of the queue.
         /// </param>
         /// <returns>The number of message in a queue</returns>
-        Task<long> GetCount(string queueName);
+        Task<long> GetCountAsync(string queueName);
 
         /// <summary>
         ///   Gets the queues names.
@@ -84,6 +72,6 @@ namespace Aguacongas.RedisQueue
         /// <value>
         ///   The queues names.
         /// </value>
-        Task<IEnumerable<string>> Queues { get; }
+        Task<IEnumerable<string>> QueuesAsync { get; }
     }
 }

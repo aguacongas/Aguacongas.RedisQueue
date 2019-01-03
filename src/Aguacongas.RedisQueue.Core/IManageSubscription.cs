@@ -1,7 +1,5 @@
 ﻿using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Aguacongas.RedisQueue
@@ -9,5 +7,6 @@ namespace Aguacongas.RedisQueue
     public interface IManageSubscription
     {
         Task Handle(RedisChannel channel, RedisValue value);
+        Task Publish(string address, Guid id);
     }
 }

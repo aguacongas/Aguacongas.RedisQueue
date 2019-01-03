@@ -8,51 +8,52 @@ namespace Aguacongas.RedisQueue
 {
     public class QueuesManager : IManageQueues
     {
-        private readonly ISubscriber _subscriber;
         private readonly IStore _store;
         private readonly IManageSubscription _subscriptionManager;
-        public Task<IEnumerable<string>> Queues => throw new NotImplementedException();
 
-        public async Task<Message> Dequeue(string fromQueueName)
+        public QueuesManager(IStore store, IManageSubscription subscriptionManager)
+        {
+            _store = store;
+            _subscriptionManager = subscriptionManager;
+        }
+
+        public Task<IEnumerable<string>> QueuesAsync => _store.Queues();
+
+        public async Task<Message> DequeueAsync(string fromQueueName)
         {
             var message = await _store.Pop(fromQueueName);
             return GetData(message);
         }
 
-        public async Task<Guid> Enqueue(string address, string payload)
+        public async Task EnqueueAsync(Message message)
         {
-            var id = Guid.NewGuid();
-            var message = new Message
+            if (string.IsNullOrEmpty(message.QueueName))
             {
-                Created = DateTimeOffset.Now,
-                QueueNane = GetQueueName(address),
-                Payload = payload,
-                Id = id,
-            };
-            await Enqueue(message).ConfigureAwait(false);
-            return message.Id;
-        }
-
-        public async Task Enqueue(Message message)
-        {
+                throw new InvalidOperationException("The message queue name cannot be empty");
+            }
+            if (string.IsNullOrEmpty(message.Payload))
+            {
+                throw new InvalidOperationException("The message payload cannot be empty");
+            }
+            message.Created = DateTimeOffset.Now;
             await _store.Push(message).ConfigureAwait(false);
-            await Publish(message.QueueNane, message.Id).ConfigureAwait(false);
+            await Publish(message.QueueName, message.Id).ConfigureAwait(false);
         }
 
-        public async Task<Message> Peek(string fromQueueName)
+        public async Task<Message> PeekAsync(string fromQueueName)
         {
             var message = await _store.Peek(fromQueueName).ConfigureAwait(false);
             return GetData(message);
         }
 
 
-        public async Task<Message> Get(Guid id, string fromQueueName)
+        public async Task<Message> GetAsync(Guid id, string fromQueueName)
         {
             var message = await _store.Get(id, fromQueueName).ConfigureAwait(false);
             return GetData(message);
         }
 
-        public async Task<long> GetCount(string queueName)
+        public async Task<long> GetCountAsync(string queueName)
         {
             var keys = await _store.GetKeys(queueName);
             return keys.Count();
@@ -67,16 +68,9 @@ namespace Aguacongas.RedisQueue
             return null;
         }
 
-        private async Task Publish(string address, Guid id)
+        private Task Publish(string address, Guid id)
         {
-            if (!_subscriber.IsConnected(address))
-            {
-                _subscriber.Subscribe(address, async (c, v) =>
-                {
-                    await _subscriptionManager.Handle(c, v).ConfigureAwait(false);
-                });
-            }
-            await _subscriber.PublishAsync(address, id.ToString());
+            return _subscriptionManager.Publish(address, id);
         }
 
         private string GetQueueName(string address)
