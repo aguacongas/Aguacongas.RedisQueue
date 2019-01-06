@@ -16,7 +16,7 @@ namespace Aguacongas.RedisQueue
             _serilizer = serializer;
         }
 
-        public Task<IEnumerable<string>> Queues()
+        public Task<IEnumerable<string>> QueuesAsync()
         {
             var multipexer = _database.Multiplexer;
             var endpoints = multipexer.GetEndPoints();
@@ -37,7 +37,7 @@ namespace Aguacongas.RedisQueue
             return Task.FromResult((IEnumerable<string>)queueNames);
         }
 
-        public async Task Push(Message message)
+        public async Task PushAsync(Message message)
         {
             var transaction = _database.CreateTransaction();
 
@@ -49,18 +49,18 @@ namespace Aguacongas.RedisQueue
             await transaction.ExecuteAsync();
         }
 
-        public Task<Message> Get(Guid id, string queueName)
+        public Task<Message> GetAsync(Guid id, string queueName)
         {
             return Get(queueName, id.ToString());
         }
 
-        public async Task<IEnumerable<Guid>> GetKeys(string queueName)
+        public async Task<IEnumerable<Guid>> GetKeysAsync(string queueName)
         {
             var ids = await _database.ListRangeAsync("queue/" + queueName);
             return GetIds(ids, queueName);
         }
 
-        public async Task<Message> Pop(string fromQueueName)
+        public async Task<Message> PopAsync(string fromQueueName)
         {
             string id = await _database.ListLeftPopAsync("queue/" + fromQueueName);
             var message = await Get(fromQueueName, id);
@@ -71,10 +71,27 @@ namespace Aguacongas.RedisQueue
             return message;
         }
 
-        public async Task<Message> Peek(string fromQueueName)
+        public async Task<Message> PeekAsync(string fromQueueName)
         {
             var id = await _database.ListGetByIndexAsync("queue/" + fromQueueName, 0);
             return await Get(fromQueueName, id);
+        }
+
+
+        public async Task<Message> PopIndexAsync(string fromQueueName)
+        {
+            string id = await _database.ListLeftPopAsync("queue/" + fromQueueName);
+            return await Get(fromQueueName, id);
+        }
+
+        public Task RePushIndexAsync(Message message)
+        {
+            return _database.ListLeftPushAsync("queue/" + message.QueueName, message.Id.ToString());
+        }
+
+        public Task RemoveDataAsync(Message message)
+        {
+            return _database.HashDeleteAsync("data/" + message.QueueName, message.Id.ToString());
         }
 
         private async Task<Message> Get(string fromQueueName, string id)

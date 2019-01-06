@@ -1,5 +1,4 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,11 +16,11 @@ namespace Aguacongas.RedisQueue
             _subscriptionManager = subscriptionManager;
         }
 
-        public Task<IEnumerable<string>> QueuesAsync => _store.Queues();
+        public IEnumerable<string> Queues => _subscriptionManager.Queues;
 
         public async Task<Message> DequeueAsync(string fromQueueName)
         {
-            var message = await _store.Pop(fromQueueName);
+            var message = await _store.PopAsync(fromQueueName);
             return GetData(message);
         }
 
@@ -36,33 +35,37 @@ namespace Aguacongas.RedisQueue
                 throw new InvalidOperationException("The message payload cannot be empty");
             }
             message.Created = DateTimeOffset.Now;
-            await _store.Push(message).ConfigureAwait(false);
+            await _store.PushAsync(message).ConfigureAwait(false);
             await Publish(message.QueueName, message.Id).ConfigureAwait(false);
         }
 
         public async Task<Message> PeekAsync(string fromQueueName)
         {
-            var message = await _store.Peek(fromQueueName).ConfigureAwait(false);
+            var message = await _store.PeekAsync(fromQueueName).ConfigureAwait(false);
             return GetData(message);
         }
 
 
         public async Task<Message> GetAsync(Guid id, string fromQueueName)
         {
-            var message = await _store.Get(id, fromQueueName).ConfigureAwait(false);
+            var message = await _store.GetAsync(id, fromQueueName).ConfigureAwait(false);
             return GetData(message);
         }
 
         public async Task<long> GetCountAsync(string queueName)
         {
-            var keys = await _store.GetKeys(queueName);
+            var keys = await _store.GetKeysAsync(queueName);
             return keys.Count();
         }
+
+
+        public Task<IEnumerable<Guid>> GetKeysAsync(string queueName) => _store.GetKeysAsync(queueName);
 
         private static Message GetData(Message message)
         {
             if (message != null && message.Payload != null)
             {
+                message.InitiatorToken = null;
                 return message;
             }
             return null;

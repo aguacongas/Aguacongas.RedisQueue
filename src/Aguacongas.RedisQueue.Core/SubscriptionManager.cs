@@ -3,8 +3,10 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -14,13 +16,15 @@ namespace Aguacongas.RedisQueue
 {
     public class SubscriptionManager : IManageSubscription
     {
-        private static readonly Regex _isRemote = new Regex("^(http|https)://");
+        public static Regex IsRemote { get; } = new Regex("^(http|https):/");
 
         private readonly ConcurrentDictionary<string, ManagerBase> _managers = new ConcurrentDictionary<string, ManagerBase>();
         private readonly ISubscriber _subscriber;
         private readonly IStore _store;
         private readonly HttpClient _httpClient;
         private readonly ILogger<SubscriptionManager> _logger;
+
+        public IEnumerable<string> Queues => _managers.Keys;
 
         public SubscriptionManager(ISubscriber subscriber, IStore store, HttpClient httpClient, ILogger<SubscriptionManager> logger)
         {
@@ -57,7 +61,7 @@ namespace Aguacongas.RedisQueue
 
         private bool IsLocal(string address)
         {
-            return !_isRemote.IsMatch(address);
+            return !IsRemote.IsMatch(address);
         }
 
         abstract class ManagerBase
@@ -116,30 +120,57 @@ namespace Aguacongas.RedisQueue
             }
 
             public override async Task<ManagerBase> Handle(string value)
-            {
-                string messageId = value;
-
+            {               
                 Message message;
-                while((message = await _store.Pop(Address).ConfigureAwait(false)) != null)
+                while((message = await _store.PopIndexAsync(Address).ConfigureAwait(false)) != null)
                 {
-                    var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
-                    var response = await _httpClient.PostAsync(Address, content).ConfigureAwait(false);
-                    if (!response.IsSuccessStatusCode)
+                    using (var request = new HttpRequestMessage(HttpMethod.Put, Address))
                     {
-                        if (response.StatusCode != HttpStatusCode.Unauthorized)
+                        if (!string.IsNullOrWhiteSpace(message.InitiatorToken))
                         {
-                            _logger.LogWarning("Connexion to {Address} lost", Address);
+                            var tokenInfos = message.InitiatorToken.Split(new char[' '], 2);
+                            request.Headers.Authorization = new AuthenticationHeaderValue(tokenInfos[0], tokenInfos[1]);
+                        }
 
-                            await _store.Push(message);
-                            return new RemoteFailManager(this, _subscriber, _store, _httpClient, _logger)
+                        var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+                        request.Content = content;
+
+                        try
+                        {
+                            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                            if (!response.IsSuccessStatusCode)
                             {
-                                Address = Address
-                            };
+                                if (response.StatusCode != HttpStatusCode.Unauthorized || response.StatusCode != HttpStatusCode.Forbidden)
+                                {
+                                    return await Requeue(message);
+                                }
+                                else
+                                {
+                                    _logger.LogError("Send message {MessageId} to {Address} {StatusCode}", message.Id, Address, response.StatusCode);
+                                }
+                            }
+
+                            await _store.RemoveDataAsync(message).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            return await Requeue(message);
                         }
                     }
 
                 }
                 return this;
+            }
+
+            private async Task<ManagerBase> Requeue(Message message)
+            {
+                _logger.LogWarning("Connexion to {Address} lost", Address);
+
+                await _store.RePushIndexAsync(message).ConfigureAwait(false);
+                return new RemoteFailManager(this, _subscriber, _store, _httpClient, _logger)
+                {
+                    Address = Address
+                };
             }
         }
 
@@ -186,7 +217,7 @@ namespace Aguacongas.RedisQueue
 
                         _current = _parent;
                         // publish a queue event to reset the queue manager
-                        var message = await _store.Peek(Address);
+                        var message = await _store.PeekAsync(Address);
                         if (message != null)
                         {
                             await _subscriber.PublishAsync(Address, message.Id.ToString());

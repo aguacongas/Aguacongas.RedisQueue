@@ -7,7 +7,7 @@ namespace Aguacongas.RedisQueue
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddRedisQueue(this IServiceCollection services, string configuration, int? database = null, string httpClientName = "redisQueue")
+        public static IServiceCollection AddRedisQueue(this IServiceCollection services, string configuration, int? database = null)
         {
             services.AddSingleton<IConnectionMultiplexer>(provider =>
             {
@@ -21,10 +21,10 @@ namespace Aguacongas.RedisQueue
                 {
                     var multiplexer = provider.GetRequiredService<IConnectionMultiplexer>();
                     return multiplexer.GetDatabase(database ?? -1);
-                }, httpClientName);
+                });
         }
 
-        public static IServiceCollection AddRedisQueue(this IServiceCollection services, Func<IServiceProvider, IDatabase> getDatabase, string httpClientName = "redisQueue")
+        public static IServiceCollection AddRedisQueue(this IServiceCollection services, Func<IServiceProvider, IDatabase> getDatabase)
         {
             services
                 .AddLogging()
@@ -34,7 +34,7 @@ namespace Aguacongas.RedisQueue
                     return db.Multiplexer.GetSubscriber();
                 })
                 .AddSingleton<IManageSubscription, SubscriptionManager>()
-                .AddScoped<IStore>(provider =>
+                .AddTransient<IStore>(provider =>
                 {
                     var db = getDatabase(provider);
                     var serializer = provider.GetRequiredService<ISerialize>();
