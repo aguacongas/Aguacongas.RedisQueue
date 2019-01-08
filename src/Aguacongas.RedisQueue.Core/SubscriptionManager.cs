@@ -14,8 +14,18 @@ using System.Threading.Tasks;
 
 namespace Aguacongas.RedisQueue
 {
+    /// <summary>
+    /// Manage redis subscription
+    /// </summary>
+    /// <seealso cref="Aguacongas.RedisQueue.IManageSubscription" />
     public class SubscriptionManager : IManageSubscription
     {
+        /// <summary>
+        /// Gets the is remote regex.
+        /// </summary>
+        /// <value>
+        /// The is remote regex.
+        /// </value>
         public static Regex IsRemote { get; } = new Regex("^(http|https):/");
 
         private readonly ConcurrentDictionary<string, ManagerBase> _managers = new ConcurrentDictionary<string, ManagerBase>();
@@ -24,8 +34,21 @@ namespace Aguacongas.RedisQueue
         private readonly HttpClient _httpClient;
         private readonly ILogger<SubscriptionManager> _logger;
 
+        /// <summary>
+        /// Gets the queues names.
+        /// </summary>
+        /// <value>
+        /// The queues.
+        /// </value>
         public IEnumerable<string> Queues => _managers.Keys;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SubscriptionManager"/> class.
+        /// </summary>
+        /// <param name="subscriber">The subscriber.</param>
+        /// <param name="store">The store.</param>
+        /// <param name="httpClient">The HTTP client.</param>
+        /// <param name="logger">The logger.</param>
         public SubscriptionManager(ISubscriber subscriber, IStore store, HttpClient httpClient, ILogger<SubscriptionManager> logger)
         {
             _subscriber = subscriber;
@@ -34,13 +57,12 @@ namespace Aguacongas.RedisQueue
             _logger = logger;
         }
 
-        public async Task Handle(RedisChannel channel, RedisValue value)
-        {
-            var manager = GetOrAddManager(channel);
-            manager = await manager.Handle(value).ConfigureAwait(false);
-            _managers.AddOrUpdate(channel, manager, (c, m) => manager);
-        }
-
+        /// <summary>
+        /// Publishes a message has been queued.
+        /// </summary>
+        /// <param name="address">The address.</param>
+        /// <param name="id">The identifier.</param>
+        /// <returns></returns>
         public Task Publish(string address, Guid id)
         {
             var manger = GetOrAddManager(address);
@@ -166,7 +188,7 @@ namespace Aguacongas.RedisQueue
             {
                 _logger.LogWarning("Connexion to {Address} lost", Address);
 
-                await _store.RePushIndexAsync(message).ConfigureAwait(false);
+                await _store.RepushIndexAsync(message).ConfigureAwait(false);
                 return new RemoteFailManager(this, _subscriber, _store, _httpClient, _logger)
                 {
                     Address = Address

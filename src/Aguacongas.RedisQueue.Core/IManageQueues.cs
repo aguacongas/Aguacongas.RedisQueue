@@ -42,6 +42,11 @@ namespace Aguacongas.RedisQueue
         ///   The first message in queue or null
         /// </returns>
         Task<Message> PeekAsync(string fromQueueName);
+        /// <summary>
+        /// Gets the keys asynchronous.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
         Task<IEnumerable<Guid>> GetKeysAsync(string queueName);
 
         /// <summary>

@@ -5,8 +5,18 @@ using System;
 
 namespace Aguacongas.RedisQueue
 {
+    /// <summary>
+    /// Services collection extentions
+    /// </summary>
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds the redis queue to DI.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="database">The database.</param>
+        /// <returns></returns>
         public static IServiceCollection AddRedisQueue(this IServiceCollection services, string configuration, int? database = null)
         {
             services.AddSingleton<IConnectionMultiplexer>(provider =>
@@ -24,6 +34,12 @@ namespace Aguacongas.RedisQueue
                 });
         }
 
+        /// <summary>
+        /// Adds the redis queue to DI.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="getDatabase">The get database.</param>
+        /// <returns></returns>
         public static IServiceCollection AddRedisQueue(this IServiceCollection services, Func<IServiceProvider, IDatabase> getDatabase)
         {
             services
