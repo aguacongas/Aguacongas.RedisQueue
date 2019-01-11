@@ -330,3 +330,6 @@ ASALocalRun/
 .mfractor/
 
 /redis-64
+/ReportGenerator
+/coverage/docs
+*.cobertura.xml

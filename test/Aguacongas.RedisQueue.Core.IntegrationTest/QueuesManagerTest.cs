@@ -31,7 +31,7 @@ namespace Aguacongas.RedisQueue.Core.IntegrationTest
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.EnqueueAsync(message));
 
-            message.Payload = Guid.NewGuid().ToString();
+            message.Content = Guid.NewGuid().ToString();
 
             await sut.EnqueueAsync(message);
 
@@ -39,17 +39,17 @@ namespace Aguacongas.RedisQueue.Core.IntegrationTest
 
             var messageRead = await sut.GetAsync(message.Id, message.QueueName);
 
-            Assert.Equal(messageRead.Payload, message.Payload);
+            Assert.Equal(messageRead.Content, message.Content);
 
             messageRead = await sut.PeekAsync(message.QueueName);
 
             Assert.Equal(messageRead.Id, message.Id);
-            Assert.Equal(messageRead.Payload, message.Payload);
+            Assert.Equal(messageRead.Content, message.Content);
 
             messageRead = await sut.DequeueAsync(message.QueueName);
 
             Assert.Equal(messageRead.Id, message.Id);
-            Assert.Equal(messageRead.Payload, message.Payload);
+            Assert.Equal(messageRead.Content, message.Content);
 
             Assert.Equal(0, await sut.GetCountAsync(message.QueueName));
         }
@@ -76,7 +76,7 @@ namespace Aguacongas.RedisQueue.Core.IntegrationTest
 
             var message = new Message
             {
-                Payload = Guid.NewGuid().ToString(),
+                Content = Guid.NewGuid().ToString(),
                 QueueName = _fixture.TestServer.BaseAddress.ToString()
             };
 
