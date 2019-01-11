@@ -5,8 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 
 namespace Aguacongas.RedisQueue
 {
@@ -22,6 +24,9 @@ namespace Aguacongas.RedisQueue
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            var version = GetType().Assembly.GetName().Version;
+
+            Version = $"{version.Major}.{version.Minor}";
         }
 
         /// <summary>
@@ -31,6 +36,13 @@ namespace Aguacongas.RedisQueue
         /// The configuration.
         /// </value>
         public IConfiguration Configuration { get; }
+        /// <summary>
+        /// Gets the version.
+        /// </summary>
+        /// <value>
+        /// The version.
+        /// </value>
+        public string Version { get; }
 
         /// <summary>
         /// Configures the services.
@@ -44,14 +56,26 @@ namespace Aguacongas.RedisQueue
                 {
                     var info = new Info
                     {
-                        Version = "1.0.0"
+                        Version = Version,
+                        Contact = new Contact
+                        {
+                            Email = "aguacongas@gmail.com",
+                            Name = "Olivier Lefebvre",
+                            Url = "https://github.com/aguacongas/DymamicAuthProviders"
+                        },
+                        License = new License
+                        {
+                            Name = "MIT",
+                            Url = "https://github.com/aguacongas/DymamicAuthProviders/blob/master/LICENSE"
+                        },
+                        Title = "Aguacongas.RedisQueue API"
                     };
 
                     c.SwaggerDoc(info.Version, info);
 
                     // Set the comments path for the Swagger JSON and UI.
                     var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-                    var xmlPath = Path.Combine(basePath, "Aguacongas.RedisQueue.xml");
+                    var xmlPath = Path.Combine(basePath, "Aguacongas.RedisQueue.Web.xml");
                     c.IncludeXmlComments(xmlPath);
                     c.IgnoreObsoleteActions();
                     c.IgnoreObsoleteProperties();
@@ -84,7 +108,7 @@ namespace Aguacongas.RedisQueue
                 .UseSwagger()
                 .UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint($"/swagger/1.0.0/swagger.json", "Aguacongas.RedisQueue");
+                    c.SwaggerEndpoint($"/swagger/{Version}/swagger.json", "Aguacongas.RedisQueue");
                 })
                 .UseMvc();
         }

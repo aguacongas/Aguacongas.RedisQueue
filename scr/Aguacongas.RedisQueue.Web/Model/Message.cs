@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 
-namespace Aguacongas.RedisQueue
+namespace Aguacongas.RedisQueue.Model
 {
     /// <summary>
     /// Define a message
@@ -20,6 +23,7 @@ namespace Aguacongas.RedisQueue
         /// <value>
         /// The name of the queue.
         /// </value>
+        [Required]
         public string QueueName { get; set; }
         /// <summary>
         /// Gets or sets the creation date.
@@ -29,18 +33,12 @@ namespace Aguacongas.RedisQueue
         /// </value>
         public DateTimeOffset Created { get; set; }
         /// <summary>
-        /// Gets or sets the initiator authorization token.
-        /// </summary>
-        /// <value>
-        /// The initiator token.
-        /// </value>
-        public string InitiatorToken { get; set; }
-        /// <summary>
         /// Gets or sets the content.
         /// </summary>
         /// <value>
         /// The content.
         /// </value>
-        public string Content{ get; set; }
-    }   
+        [Required]
+        public string Content { get; set; }
+    }
 }

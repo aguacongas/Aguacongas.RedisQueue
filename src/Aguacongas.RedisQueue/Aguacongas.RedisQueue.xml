@@ -4,76 +4,6 @@
         <name>Aguacongas.RedisQueue</name>
     </assembly>
     <members>
-        <member name="T:Aguacongas.RedisQueue.Controllers.QeuesController">
-            <summary>
-            Manage queues
-            </summary>
-            <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.#ctor(Aguacongas.RedisQueue.IManageQueues)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Aguacongas.RedisQueue.Controllers.QeuesController"/> class.
-            </summary>
-            <param name="manager">The manager.</param>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Get">
-            <summary>
-            Gets all queues.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Get(System.String)">
-            <summary>
-            Dequeue a message.
-            </summary>
-            <param name="queueName">Name of the queue.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Peek(System.String)">
-            <summary>
-            Peeks the specified queue name.
-            </summary>
-            <param name="queueName">Name of the queue.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Read(System.String,System.Guid)">
-            <summary>
-            Reads the specified queue name.
-            </summary>
-            <param name="queueName">Name of the queue.</param>
-            <param name="id">The identifier.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Count(System.String)">
-            <summary>
-            Counts the specified queue name.
-            </summary>
-            <param name="queueName">Name of the queue.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Keys(System.String)">
-            <summary>
-            Keyses the specified queue name.
-            </summary>
-            <param name="queueName">Name of the queue.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Post(System.String,System.String)">
-            <summary>
-            Posts the specified destination.
-            </summary>
-            <param name="destination">The destination.</param>
-            <param name="value">The value.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Put(System.String,Aguacongas.RedisQueue.Message)">
-            <summary>
-            Puts the specified destination.
-            </summary>
-            <param name="destination">The destination.</param>
-            <param name="message">The message.</param>
-            <returns></returns>
-        </member>
         <member name="T:Aguacongas.RedisQueue.Program">
             <summary>
             
@@ -109,6 +39,14 @@
             </summary>
             <value>
             The configuration.
+            </value>
+        </member>
+        <member name="P:Aguacongas.RedisQueue.Startup.Version">
+            <summary>
+            Gets the version.
+            </summary>
+            <value>
+            The version.
             </value>
         </member>
         <member name="M:Aguacongas.RedisQueue.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">

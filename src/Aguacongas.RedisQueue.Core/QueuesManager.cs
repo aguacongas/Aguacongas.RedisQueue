@@ -65,7 +65,7 @@ namespace Aguacongas.RedisQueue
             {
                 throw new InvalidOperationException("The message queue name cannot be empty");
             }
-            if (string.IsNullOrEmpty(message.Payload))
+            if (string.IsNullOrEmpty(message.Content))
             {
                 throw new InvalidOperationException("The message payload cannot be empty");
             }
@@ -118,7 +118,7 @@ namespace Aguacongas.RedisQueue
 
         private static Message GetData(Message message)
         {
-            if (message != null && message.Payload != null)
+            if (message != null && message.Content != null)
             {
                 message.InitiatorToken = null;
                 return message;
