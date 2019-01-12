@@ -29,10 +29,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "template", "template", "{09236A40-4AB0-49AA-A341-BAB073342811}"
+	ProjectSection(SolutionItems) = preProject
+		template\Aguacongas.RedisQueue.nuspec = template\Aguacongas.RedisQueue.nuspec
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aguacongas.RedisQueue.Web", "src\Aguacongas.RedisQueue.Web\Aguacongas.RedisQueue.Web.csproj", "{B68BA7E9-E9B1-4B64-822F-D27D13D2E4A4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aguacongas.RedisQueue", "template\Aguacongas.RedisQueue\Aguacongas.RedisQueue.csproj", "{E01E084A-0CEB-4BE4-86BE-7C0B7446E9DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".template.config", ".template.config", "{12AF1F95-1E21-48F9-B528-BD75E16F9E60}"
+	ProjectSection(SolutionItems) = preProject
+		template\.template.config\template.json = template\.template.config\template.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +109,7 @@ Global
 		{A8F2475A-E835-401F-B6B0-04E65E5BF458} = {CC32E007-F562-4CAF-A60F-5B1CE7EF5C01}
 		{B68BA7E9-E9B1-4B64-822F-D27D13D2E4A4} = {CCEF89D6-C46A-4DAE-B628-539DE25145B5}
 		{E01E084A-0CEB-4BE4-86BE-7C0B7446E9DA} = {09236A40-4AB0-49AA-A341-BAB073342811}
+		{12AF1F95-1E21-48F9-B528-BD75E16F9E60} = {09236A40-4AB0-49AA-A341-BAB073342811}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A26D67C2-4107-42C8-8517-0C7BB4E59ABA}

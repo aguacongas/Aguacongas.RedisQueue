@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>Aguacongas.RedisQueue</RootNamespace>
+    <Authors>Olivier Lefebvre</Authors>
+    <Description>Core library to manage queues hosted by redis</Description>
+    <Copyright>Copyright (c) 2018 @Olivier Lefebvre</Copyright>
+    <PackageLicenseUrl>https://github.com/aguacongas/Aguacongas.RedisQueue/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/aguacongas/Aguacongas.RedisQueue</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/aguacongas/Aguacongas.RedisQueue</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>aspnetcore;queue;redis;signalR</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
