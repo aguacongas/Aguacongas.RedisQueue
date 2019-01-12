@@ -1,5 +1,11 @@
 $result = 0
 
+if ($env:APPVEYOR -ne $true) {
+    $env:SemVer = "1.0.0"
+    $now = (Get-Date -Date ((Get-Date).DateTime) -UFormat %s)
+    $env:Version = "1.0.0-local$now"
+}
+
 if ($isLinux) {
 	Get-ChildItem -rec `
 	| Where-Object { $_.Name -like "*.IntegrationTest.csproj" `
@@ -19,7 +25,7 @@ if ($isLinux) {
 		   -Or $_.Name -like "*.Test.csproj" `
 		 } `
 	| ForEach-Object { 
-        &('dotnet') ('test', $_.FullName, '--logger', "trx;LogFileName=$_.trx", '-c', 'Release', '/p:CollectCoverage=true', '/p:CoverletOutputFormat=cobertura')    
+        &('dotnet') ('test', $_.FullName, '--logger', "trx;LogFileName=$_.trx", '-c', 'Release', '/p:CollectCoverage=true', '/p:CoverletOutputFormat=cobertura', '/p:Exclude=\"[xunit.*]*')    
 		if ($LASTEXITCODE -ne 0) {
 			$result = $LASTEXITCODE
 		}
@@ -35,5 +41,8 @@ if ($isLinux) {
     Write-Host $merge
     ReportGenerator\tools\net47\ReportGenerator.exe "-reports:$merge" "-targetdir:coverage\docs" "-reporttypes:HtmlInline;Badges"
 }
+
+.\publish.ps1
+
 exit $result
   

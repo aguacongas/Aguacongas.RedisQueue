@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Aguacongas.RedisQueue.Core\Aguacongas.RedisQueue.Core.csproj" />
+    <ProjectReference Include="..\Aguacongas.RedisQueue.Core\Aguacongas.RedisQueue.Core.csproj" />
   </ItemGroup>
 
 </Project>

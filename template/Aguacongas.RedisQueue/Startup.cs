@@ -5,10 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
-using System;
 using System.IO;
 using System.Net.Http;
-using System.Reflection;
 
 namespace Aguacongas.RedisQueue
 {
@@ -80,6 +78,13 @@ namespace Aguacongas.RedisQueue
                     c.IgnoreObsoleteActions();
                     c.IgnoreObsoleteProperties();
                 })
+                .AddAuthorization(options =>
+                {
+                    options.AddPolicy("RedisQueues", policy =>
+                    {
+                        policy.Requirements.Add(new RedisQueueRequirement());
+                    });
+                })
                 .AddRedisQueue("localhost:6379")
                 .AddHttpClient()
                 .AddTransient(provider => provider.GetRequiredService<IHttpClientFactory>().CreateClient())
@@ -109,6 +114,10 @@ namespace Aguacongas.RedisQueue
                 .UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint($"/swagger/{Version}/swagger.json", "Aguacongas.RedisQueue");
+                })
+                .UseSignalR(options =>
+                {
+                    options.MapHub<QueueHub>("/queues");
                 })
                 .UseMvc();
         }

@@ -4,7 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Aguacongas.RedisQueue.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Primitives;
 
 namespace Aguacongas.RedisQueue.Controllers
@@ -13,15 +15,16 @@ namespace Aguacongas.RedisQueue.Controllers
     /// Manage queues
     /// </summary>
     /// <seealso cref="ControllerBase" />
-    [Route("queues/")]
+    [Authorize(Policy = "RedisQueues")]
     [Produces("application/json")]
+    [Route("api/{controller}")]
     [ApiController]
     public class QeuesController : ControllerBase
     {
         private readonly IManageQueues _manager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QeuesController"/> class.
+        /// Initializes a new instance of the <see cref="QeuesController" /> class.
         /// </summary>
         /// <param name="manager">The manager.</param>
         public QeuesController(IManageQueues manager)

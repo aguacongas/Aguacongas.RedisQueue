@@ -18,7 +18,7 @@
         </member>
         <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.#ctor(Aguacongas.RedisQueue.IManageQueues)">
             <summary>
-            Initializes a new instance of the <see cref="T:Aguacongas.RedisQueue.Controllers.QeuesController" /> class.
+            Initializes a new instance of the <see cref="T:Aguacongas.RedisQueue.Controllers.QeuesController"/> class.
             </summary>
             <param name="manager">The manager.</param>
         </member>

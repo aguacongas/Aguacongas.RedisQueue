@@ -17,12 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aguacongas.RedisQueue.Web" Version="1.0.0-*" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\scr\Aguacongas.RedisQueue.Web\Aguacongas.RedisQueue.Web.csproj" />
   </ItemGroup>
 
 </Project>

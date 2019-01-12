@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
@@ -32,6 +33,7 @@ namespace Aguacongas.RedisQueue
         private readonly ISubscriber _subscriber;
         private readonly IStore _store;
         private readonly HttpClient _httpClient;
+        private readonly IHubContext<QueueHub> _hubContext;
         private readonly ILogger<SubscriptionManager> _logger;
 
         /// <summary>
@@ -49,11 +51,16 @@ namespace Aguacongas.RedisQueue
         /// <param name="store">The store.</param>
         /// <param name="httpClient">The HTTP client.</param>
         /// <param name="logger">The logger.</param>
-        public SubscriptionManager(ISubscriber subscriber, IStore store, HttpClient httpClient, ILogger<SubscriptionManager> logger)
+        public SubscriptionManager(ISubscriber subscriber,
+            IStore store, 
+            HttpClient httpClient, 
+            IHubContext<QueueHub> hubContext,
+            ILogger<SubscriptionManager> logger)
         {
             _subscriber = subscriber;
             _store = store;
             _httpClient = httpClient;
+            _hubContext = hubContext;
             _logger = logger;
         }
 
@@ -75,7 +82,7 @@ namespace Aguacongas.RedisQueue
             {
                 if (IsLocal(c))
                 {
-                    return new LocalManager(address, _subscriber);
+                    return new LocalManager(address, _subscriber, _hubContext);
                 }
                 return new RemoteManager(address, _httpClient, _store, _subscriber, _logger);
             });
@@ -97,16 +104,20 @@ namespace Aguacongas.RedisQueue
         class LocalManager : ManagerBase
         {
             private readonly ISubscriber _subscriber;
+            private readonly IHubContext<QueueHub> _hubContext;
 
-            public LocalManager(string address, ISubscriber subscriber)
+            public LocalManager(string address, ISubscriber subscriber, IHubContext<QueueHub> hubContext)
             {
                 Address = address;
                 _subscriber = subscriber;
+                _hubContext = hubContext;
             }
 
-            public override Task PublishAsync(string id)
+            public async override Task PublishAsync(string id)
             {
-                return _subscriber.PublishAsync(Address, id);
+                await _subscriber.PublishAsync(Address, id);
+                await _hubContext.Clients.Group(Address)
+                    .SendAsync("newMessage", id);
             }
             public override Task<ManagerBase> Handle(string value)
             {

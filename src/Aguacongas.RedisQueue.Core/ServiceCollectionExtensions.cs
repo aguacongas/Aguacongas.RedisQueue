@@ -43,7 +43,7 @@ namespace Aguacongas.RedisQueue
         public static IServiceCollection AddRedisQueue(this IServiceCollection services, Func<IServiceProvider, IDatabase> getDatabase)
         {
             services
-                .AddLogging()
+                .AddLogging()                
                 .AddSingleton(provider =>
                 {
                     var db = getDatabase(provider);
@@ -57,7 +57,8 @@ namespace Aguacongas.RedisQueue
                     return new Store(db, serializer);
                 })
                 .AddTransient<IManageQueues, QueuesManager>()
-                .AddTransient<ISerialize, MessageSerializer>();
+                .AddTransient<ISerialize, MessageSerializer>()
+                .AddSignalR();
 
             return services;
         }
