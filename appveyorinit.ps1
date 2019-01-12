@@ -28,5 +28,3 @@ if (![string]::IsNullOrEmpty($env:GitVersion_PreReleaseLabel))
 appveyor SetVariable -Name Version -Value $nextversion
 appveyor UpdateBuild -Version $nextversion
 appveyor AddMessage "Version = $nextversion"
-
-dotnet restore
