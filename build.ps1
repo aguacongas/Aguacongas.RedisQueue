@@ -47,7 +47,7 @@ if ($isLinux) {
     ReportGenerator\tools\net47\ReportGenerator.exe "-reports:$merge" "-targetdir:coverage\docs" "-reporttypes:HtmlInline;Badges"
 }
 
-.\publish.ps1
+./publish.ps1
 
 exit $result
   
