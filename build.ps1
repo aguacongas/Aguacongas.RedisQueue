@@ -1,3 +1,8 @@
+$path = "artifacts/build"
+if (!(Test-Path $path)) {
+    New-Item -ItemType Directory -Force -Path $path
+}
+
 $result = 0
 
 if ($env:APPVEYOR -ne $true) {
