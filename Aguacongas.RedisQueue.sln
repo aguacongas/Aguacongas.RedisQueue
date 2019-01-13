@@ -42,6 +42,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".template.config", ".templa
 		template\.template.config\template.json = template\.template.config\template.json
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aguacongas.RedisQueue.Web.Test", "test\Aguacongas.RedisQueue.Web.Test\Aguacongas.RedisQueue.Web.Test.csproj", "{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,6 +102,18 @@ Global
 		{E01E084A-0CEB-4BE4-86BE-7C0B7446E9DA}.Release|x64.Build.0 = Release|Any CPU
 		{E01E084A-0CEB-4BE4-86BE-7C0B7446E9DA}.Release|x86.ActiveCfg = Release|Any CPU
 		{E01E084A-0CEB-4BE4-86BE-7C0B7446E9DA}.Release|x86.Build.0 = Release|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Debug|x64.Build.0 = Debug|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Debug|x86.Build.0 = Debug|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Release|x64.ActiveCfg = Release|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Release|x64.Build.0 = Release|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Release|x86.ActiveCfg = Release|Any CPU
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,6 +124,7 @@ Global
 		{B68BA7E9-E9B1-4B64-822F-D27D13D2E4A4} = {CCEF89D6-C46A-4DAE-B628-539DE25145B5}
 		{E01E084A-0CEB-4BE4-86BE-7C0B7446E9DA} = {09236A40-4AB0-49AA-A341-BAB073342811}
 		{12AF1F95-1E21-48F9-B528-BD75E16F9E60} = {09236A40-4AB0-49AA-A341-BAB073342811}
+		{CB878712-FAC7-4EA7-B277-DB8E047CDC7A} = {CC32E007-F562-4CAF-A60F-5B1CE7EF5C01}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A26D67C2-4107-42C8-8517-0C7BB4E59ABA}
