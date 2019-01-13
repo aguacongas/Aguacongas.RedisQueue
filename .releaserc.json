@@ -1,9 +1,0 @@
-{
-  "tagFormat": "${version}",
-  "noCi": true,
-  "verifyConditions":["@semantic-release/github"],
-  "generateNotes": "@semantic-release/release-notes-generator",
-  "publish": "@semantic-release/github",
-  "success": "@semantic-release/github",
-  "fail": "@semantic-release/github"
-}
