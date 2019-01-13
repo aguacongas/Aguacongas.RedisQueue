@@ -1,3 +1,8 @@
+$path = "artifacts/build"
+if (!(Test-Path $path)) {
+    New-Item -ItemType Directory -Force -Path $path
+}
+
 $result = 0
 
 if ($env:APPVEYOR -ne $true) {
@@ -42,7 +47,7 @@ if ($isLinux) {
     ReportGenerator\tools\net47\ReportGenerator.exe "-reports:$merge" "-targetdir:coverage\docs" "-reporttypes:HtmlInline;Badges"
 }
 
-.\publish.ps1
+./publish.ps1
 
 exit $result
   

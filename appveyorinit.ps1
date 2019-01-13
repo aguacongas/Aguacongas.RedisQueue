@@ -1,3 +1,8 @@
+$path = "artifacts/build"
+if (!(Test-Path $path)) {
+    New-Item -ItemType Directory -Force -Path $path
+}
+
 npm i -g semantic-release @semantic-release/exec @semantic-release/changelog @semantic-release/git @semantic-release/release-notes-generator @semantic-release/commit-analyzer 
 if (test-path ./nextversion.txt)
 {
@@ -23,5 +28,3 @@ if (![string]::IsNullOrEmpty($env:GitVersion_PreReleaseLabel))
 appveyor SetVariable -Name Version -Value $nextversion
 appveyor UpdateBuild -Version $nextversion
 appveyor AddMessage "Version = $nextversion"
-
-dotnet restore
