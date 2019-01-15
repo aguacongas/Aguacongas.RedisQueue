@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Aguacongas.RedisQueue;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
-namespace Aguacongas.RedisQueue.Authorization
+namespace Aguacongas.RedisQueue.Template.Authorization
 {
     /// <summary>
     /// Can use queues authorization handler
