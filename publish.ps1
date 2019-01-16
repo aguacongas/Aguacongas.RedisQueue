@@ -8,3 +8,5 @@ Get-ChildItem -Path src -rec `
             throw "build failed" + $d.FullName
     }
   }
+
+nuget pack "template/Aguacongas.RedisQueue.nuspec" -Version $env:Version -OutputDirectory "artifacts\build"

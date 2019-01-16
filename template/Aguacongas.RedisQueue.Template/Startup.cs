@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Aguacongas.RedisQueue;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +9,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using System.Net.Http;
 
-namespace Aguacongas.RedisQueue
+namespace Aguacongas.RedisQueue.Template
 {
     /// <summary>
     /// 

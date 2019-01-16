@@ -10,3 +10,27 @@ If you want to learn more about creating good readme files then refer the follow
 - [ASP.NET Core](https://github.com/aspnet/Home)
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
 - [Chakra Core](https://github.com/Microsoft/ChakraCore)
+
+## Install
+
+install the template `Aguacongas.RedisQueue` with
+
+``` batch
+
+dotnet new -i Aguacongas.RedisQueue
+
+```
+
+And create a project with in a folder of your choice:
+
+``` batch
+
+dotnet new redisqueue
+
+```
+
+Then configure it with authorization that meet your requirement.
+
+## Build
+
+To build the project from source code run `build.cmd` or `build.ps1`
