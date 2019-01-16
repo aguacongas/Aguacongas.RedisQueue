@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Aguacongas.RedisQueue.Web</name>
+    </assembly>
+    <members>
+        <member name="T:Aguacongas.RedisQueue.RedisQueueRequirement">
+            <summary>
+            RedisQueue requirement used by RedisQueuePolicy
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Authorization.IAuthorizationRequirement" />
+        </member>
+        <member name="T:Aguacongas.RedisQueue.Controllers.QeuesController">
+            <summary>
+            Manage queues
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.#ctor(Aguacongas.RedisQueue.IManageQueues)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Aguacongas.RedisQueue.Controllers.QeuesController"/> class.
+            </summary>
+            <param name="manager">The manager.</param>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Get">
+            <summary>
+            Gets all queues names.
+            </summary>
+            <returns>List of queue name</returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Get(System.String)">
+            <summary>
+            Dequeue a message.
+            </summary>
+            <param name="queueName">Name of the queue.</param>
+            <returns>The 1st message in the queue</returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Peek(System.String)">
+            <summary>
+            Peeks the specified queue name.
+            </summary>
+            <param name="queueName">Name of the queue.</param>
+            <returns>The 1st message in the queue</returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Read(System.String,System.Guid)">
+            <summary>
+            Reads the specified queue name.
+            </summary>
+            <param name="queueName">Name of the queue.</param>
+            <param name="id">The identifier.</param>
+            <returns>A message</returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Count(System.String)">
+            <summary>
+            Counts the specified queue name.
+            </summary>
+            <param name="queueName">Name of the queue.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.GetIdList(System.String)">
+            <summary>
+            Gets the identifier list.
+            </summary>
+            <param name="queueName">Name of the queue.</param>
+            <returns>The list of message identifier of specified queue</returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Post(System.String,System.String)">
+            <summary>
+            Creates a new message with the serialized value and queue it to the specified destination.
+            </summary>
+            <param name="destination">The destination.</param>
+            <param name="serializedContent">The serialized value.</param>
+            <returns>The message identifier</returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Put(System.String,Aguacongas.RedisQueue.Model.Message)">
+            <summary>
+            Queues a message to the specified destination.
+            </summary>
+            <param name="destination">The destination.</param>
+            <param name="message">The message.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Aguacongas.RedisQueue.Extensions.MessageExtension">
+            <summary>
+            Message extensions
+            </summary>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Extensions.MessageExtension.ToDto(Aguacongas.RedisQueue.Model.Message,System.String)">
+            <summary>
+            To the dto.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="initiatorToken">The initiator token.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Extensions.MessageExtension.ToModel(Aguacongas.RedisQueue.Message)">
+            <summary>
+            To the model.
+            </summary>
+            <param name="message">The message.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Aguacongas.RedisQueue.Model.Message">
+            <summary>
+            Define a message
+            </summary>
+        </member>
+        <member name="P:Aguacongas.RedisQueue.Model.Message.Id">
+            <summary>
+            Gets or sets the identifier.
+            </summary>
+            <value>
+            The identifier.
+            </value>
+        </member>
+        <member name="P:Aguacongas.RedisQueue.Model.Message.QueueName">
+            <summary>
+            Gets or sets the name of the queue.
+            </summary>
+            <value>
+            The name of the queue.
+            </value>
+        </member>
+        <member name="P:Aguacongas.RedisQueue.Model.Message.Created">
+            <summary>
+            Gets or sets the creation date.
+            </summary>
+            <value>
+            The created.
+            </value>
+        </member>
+        <member name="P:Aguacongas.RedisQueue.Model.Message.Content">
+            <summary>
+            Gets or sets the content.
+            </summary>
+            <value>
+            The content.
+            </value>
+        </member>
+    </members>
+</doc>

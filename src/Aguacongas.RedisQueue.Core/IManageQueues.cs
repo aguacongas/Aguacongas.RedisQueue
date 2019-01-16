@@ -71,6 +71,7 @@ namespace Aguacongas.RedisQueue
         /// </param>
         /// <returns>The number of message in a queue</returns>
         Task<long> GetCountAsync(string queueName);
+        void RebuildIndexesAndSubscribe();
 
         /// <summary>
         ///   Gets the queues names.

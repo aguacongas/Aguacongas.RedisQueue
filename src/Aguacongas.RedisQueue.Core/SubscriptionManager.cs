@@ -76,6 +76,11 @@ namespace Aguacongas.RedisQueue
             return manger.PublishAsync(id.ToString());
         }
 
+        public void Subscribe(string queueName)
+        {
+            GetOrAddManager(queueName);
+        }
+
         private ManagerBase GetOrAddManager(string address)
         {
             return _managers.GetOrAdd(address, c =>

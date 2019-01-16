@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Aguacongas.RedisQueue.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Aguacongas.RedisQueue.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Primitives;
 
 namespace Aguacongas.RedisQueue.Controllers
 {
@@ -17,7 +16,7 @@ namespace Aguacongas.RedisQueue.Controllers
     /// <seealso cref="ControllerBase" />
     [Authorize(Policy = "RedisQueues")]
     [Produces("application/json")]
-    [Route("api/{controller}")]
+    [Route("api/[controller]")]
     [ApiController]
     public class QeuesController : ControllerBase
     {

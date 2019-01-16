@@ -8,6 +8,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using System.Net.Http;
+using System.Security.Claims;
 
 namespace Aguacongas.RedisQueue.Template
 {
@@ -91,6 +92,9 @@ namespace Aguacongas.RedisQueue.Template
                 .AddTransient(provider => provider.GetRequiredService<IHttpClientFactory>().CreateClient())
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddAuthentication("Cookie")
+                .AddCookie();
         }
 
         /// <summary>
@@ -116,11 +120,22 @@ namespace Aguacongas.RedisQueue.Template
                 {
                     c.SwaggerEndpoint($"/swagger/{Version}/swagger.json", "Aguacongas.RedisQueue");
                 })
+                .Use(async (context, next) =>
+                {
+                    context.User = new ClaimsPrincipal(new FakeIdentity());
+                    await next();
+                })
                 .UseSignalR(options =>
                 {
                     options.MapHub<QueueHub>("/queues");
                 })
-                .UseMvc();
+                .UseMvc()
+                .UseRedisQueue();
+        }
+
+        class FakeIdentity:ClaimsIdentity
+        {
+            public override bool IsAuthenticated => true;            
         }
     }
 }

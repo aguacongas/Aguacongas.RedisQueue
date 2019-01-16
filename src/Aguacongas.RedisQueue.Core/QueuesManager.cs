@@ -116,6 +116,17 @@ namespace Aguacongas.RedisQueue
         /// <returns></returns>
         public Task<IEnumerable<Guid>> GetKeysAsync(string queueName) => _store.GetKeysAsync(queueName);
 
+
+        public void RebuildIndexesAndSubscribe()
+        {
+            var queues = _store.GetQueueNameList();
+            foreach(var queueName in queues)
+            {
+                _store.RebuildIndex(queueName);
+                _subscriptionManager.Subscribe(queueName);
+            }
+        }
+
         private static Message GetData(Message message)
         {
             if (message != null && message.Content != null)

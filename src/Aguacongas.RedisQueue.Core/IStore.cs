@@ -64,5 +64,7 @@ namespace Aguacongas.RedisQueue
         /// <param name="message">The message.</param>
         /// <returns></returns>
         Task RemoveDataAsync(Message message);
+        IEnumerable<string> GetQueueNameList();
+        void RebuildIndex(string queueName);
     }
 }

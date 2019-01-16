@@ -24,5 +24,6 @@ namespace Aguacongas.RedisQueue
         /// <param name="id">The identifier.</param>
         /// <returns></returns>
         Task Publish(string address, Guid id);
+        void Subscribe(string queueName);
     }
 }
