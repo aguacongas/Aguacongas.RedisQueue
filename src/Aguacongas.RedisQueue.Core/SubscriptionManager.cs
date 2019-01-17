@@ -150,6 +150,8 @@ namespace Aguacongas.RedisQueue
                 {
                     await Handle(v).ConfigureAwait(false);
                 });
+
+                Task.Run(() => Handle(null));
             }
 
             public override Task PublishAsync(string id)

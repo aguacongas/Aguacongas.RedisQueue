@@ -4,45 +4,168 @@
         <name>Aguacongas.RedisQueue.Web</name>
     </assembly>
     <members>
+        <member name="T:Microsoft.Extensions.DependencyInjection.AuthenticationBuilderExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AuthenticationBuilderExtensions.AddNoAuthentication(Microsoft.AspNetCore.Authentication.AuthenticationBuilder)">
+            <summary>
+            Adds the no authentication.
+            </summary>
+            <param name="builder">The builder.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AuthenticationBuilderExtensions.AddNoAuthentication(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.String)">
+            <summary>
+            Adds the no authentication.
+            </summary>
+            <param name="builder">The builder.</param>
+            <param name="scheme">The scheme.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AuthenticationBuilderExtensions.AddNoAuthentication(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.Action{Aguacongas.RedisQueue.Authentication.NoAuthenticationOptions})">
+            <summary>
+            Adds the no authentication.
+            </summary>
+            <param name="builder">The builder.</param>
+            <param name="configureOptions">The configure options.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AuthenticationBuilderExtensions.AddNoAuthentication(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.String,System.Action{Aguacongas.RedisQueue.Authentication.NoAuthenticationOptions})">
+            <summary>
+            Adds the no authentication.
+            </summary>
+            <param name="builder">The builder.</param>
+            <param name="scheme">The scheme.</param>
+            <param name="configureOptions">The configure options.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.AuthenticationBuilderExtensions.AddNoAuthentication(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.String,System.String,System.Action{Aguacongas.RedisQueue.Authentication.NoAuthenticationOptions})">
+            <summary>
+            Adds the no authentication.
+            </summary>
+            <param name="builder">The builder.</param>
+            <param name="scheme">The scheme.</param>
+            <param name="displayName">The display name.</param>
+            <param name="configureOptions">The configure options.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Aguacongas.RedisQueue.Authentication.NoAuthenticationDefault">
+            <summary>
+            Default values related to no authentication handler
+            </summary>
+        </member>
+        <member name="F:Aguacongas.RedisQueue.Authentication.NoAuthenticationDefault.AuthenticationScheme">
+            <summary>
+            The authentication scheme
+            </summary>
+        </member>
+        <member name="T:Aguacongas.RedisQueue.Authentication.NoAuthenticationHandler">
+            <summary>
+            No authentication handler
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Authentication.AuthenticationHandler`1" />
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Authentication.NoAuthenticationHandler.#ctor(Microsoft.Extensions.Options.IOptionsMonitor{Aguacongas.RedisQueue.Authentication.NoAuthenticationOptions},Microsoft.Extensions.Logging.ILoggerFactory,System.Text.Encodings.Web.UrlEncoder,Microsoft.AspNetCore.Authentication.ISystemClock)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Aguacongas.RedisQueue.Authentication.NoAuthenticationHandler"/> class.
+            </summary>
+            <param name="options">The options.</param>
+            <param name="logger">The logger.</param>
+            <param name="encoder">The encoder.</param>
+            <param name="clock">The clock.</param>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Authentication.NoAuthenticationHandler.HandleAuthenticateAsync">
+            <summary>
+            Handles the authenticate asynchronous.
+            </summary>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Authentication.NoAuthenticationHandler.HandleChallengeAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <summary>
+            Override this method to deal with 401 challenge concerns, if an authentication scheme in question
+            deals an authentication interaction as part of it's request flow. (like adding a response header, or
+            changing the 401 result to 302 of a login page or external sign-in location.)
+            </summary>
+            <param name="properties"></param>
+            <returns>
+            A Task.
+            </returns>
+        </member>
+        <member name="M:Aguacongas.RedisQueue.Authentication.NoAuthenticationHandler.HandleForbiddenAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <summary>
+            Override this method to handle Forbid.
+            </summary>
+            <param name="properties"></param>
+            <returns>
+            A Task.
+            </returns>
+        </member>
+        <member name="T:Aguacongas.RedisQueue.Authentication.NoAuthenticationIdentity">
+            <summary>
+            No authentication identity
+            </summary>
+            <seealso cref="T:System.Security.Claims.ClaimsIdentity" />
+        </member>
+        <member name="P:Aguacongas.RedisQueue.Authentication.NoAuthenticationIdentity.IsAuthenticated">
+            <summary>
+            Gets a value that indicates whether the identity has been authenticated.
+            </summary>
+            <remarks>Always return true</remarks>
+        </member>
+        <member name="P:Aguacongas.RedisQueue.Authentication.NoAuthenticationIdentity.Name">
+            <summary>
+            Gets the name of this claims identity.
+            </summary>
+            <remarks>Always return null</remarks>
+        </member>
+        <member name="T:Aguacongas.RedisQueue.Authentication.NoAuthenticationOptions">
+            <summary>
+            No authentication options
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions" />
+        </member>
         <member name="T:Aguacongas.RedisQueue.RedisQueueRequirement">
             <summary>
             RedisQueue requirement used by RedisQueuePolicy
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Authorization.IAuthorizationRequirement" />
         </member>
-        <member name="T:Aguacongas.RedisQueue.Controllers.QeuesController">
+        <member name="T:Aguacongas.RedisQueue.Controllers.QueuesController">
             <summary>
             Manage queues
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.#ctor(Aguacongas.RedisQueue.IManageQueues)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.#ctor(Aguacongas.RedisQueue.IManageQueues)">
             <summary>
-            Initializes a new instance of the <see cref="T:Aguacongas.RedisQueue.Controllers.QeuesController" /> class.
+            Initializes a new instance of the <see cref="T:Aguacongas.RedisQueue.Controllers.QueuesController" /> class.
             </summary>
             <param name="manager">The manager.</param>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Get">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Get">
             <summary>
             Gets all queues names.
             </summary>
             <returns>List of queue name</returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Get(System.String)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Get(System.String)">
             <summary>
             Dequeue a message.
             </summary>
             <param name="queueName">Name of the queue.</param>
             <returns>The 1st message in the queue</returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Peek(System.String)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Peek(System.String)">
             <summary>
             Peeks the specified queue name.
             </summary>
             <param name="queueName">Name of the queue.</param>
             <returns>The 1st message in the queue</returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Read(System.String,System.Guid)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Read(System.String,System.Guid)">
             <summary>
             Reads the specified queue name.
             </summary>
@@ -50,21 +173,21 @@
             <param name="id">The identifier.</param>
             <returns>A message</returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Count(System.String)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Count(System.String)">
             <summary>
             Counts the specified queue name.
             </summary>
             <param name="queueName">Name of the queue.</param>
             <returns></returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.GetIdList(System.String)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.GetIdList(System.String)">
             <summary>
             Gets the identifier list.
             </summary>
             <param name="queueName">Name of the queue.</param>
             <returns>The list of message identifier of specified queue</returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Post(System.String,System.String)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Post(System.String,System.String)">
             <summary>
             Creates a new message with the serialized value and queue it to the specified destination.
             </summary>
@@ -72,7 +195,7 @@
             <param name="serializedContent">The serialized value.</param>
             <returns>The message identifier</returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QeuesController.Put(System.String,Aguacongas.RedisQueue.Model.Message)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Put(System.String,Aguacongas.RedisQueue.Model.Message)">
             <summary>
             Queues a message to the specified destination.
             </summary>

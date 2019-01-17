@@ -135,7 +135,7 @@ namespace Aguacongas.RedisQueue
                 keyList.AddRange(keys);
             }
 
-            return keyList.Distinct().Select(key => key.ToString().Split(new char['/'], 2)[1]);
+            return keyList.Distinct().Select(key => ((string)key).Split(new char[] { '/' }, 2)[1]);
         }
 
         public void RebuildIndex(string queueName)

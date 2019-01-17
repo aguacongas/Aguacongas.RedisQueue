@@ -1,4 +1,7 @@
 ﻿using Aguacongas.RedisQueue;
+using Aguacongas.RedisQueue.Authentication;
+using Aguacongas.RedisQueue.Template.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -87,14 +90,15 @@ namespace Aguacongas.RedisQueue.Template
                         policy.Requirements.Add(new RedisQueueRequirement());
                     });
                 })
+                .AddTransient<IAuthorizationHandler, CanUseQueuesHandler>()
                 .AddRedisQueue("localhost:6379")
                 .AddHttpClient()
                 .AddTransient(provider => provider.GetRequiredService<IHttpClientFactory>().CreateClient())
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddAuthentication("Cookie")
-                .AddCookie();
+            services.AddAuthentication(NoAuthenticationDefault.AuthenticationScheme)
+                .AddNoAuthentication();
         }
 
         /// <summary>
@@ -120,22 +124,13 @@ namespace Aguacongas.RedisQueue.Template
                 {
                     c.SwaggerEndpoint($"/swagger/{Version}/swagger.json", "Aguacongas.RedisQueue");
                 })
-                .Use(async (context, next) =>
-                {
-                    context.User = new ClaimsPrincipal(new FakeIdentity());
-                    await next();
-                })
+                .UseAuthentication()
                 .UseSignalR(options =>
                 {
                     options.MapHub<QueueHub>("/queues");
                 })
                 .UseMvc()
                 .UseRedisQueue();
-        }
-
-        class FakeIdentity:ClaimsIdentity
-        {
-            public override bool IsAuthenticated => true;            
         }
     }
 }

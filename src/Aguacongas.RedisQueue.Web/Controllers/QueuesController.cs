@@ -18,15 +18,15 @@ namespace Aguacongas.RedisQueue.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class QeuesController : ControllerBase
+    public class QueuesController : ControllerBase
     {
         private readonly IManageQueues _manager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QeuesController" /> class.
+        /// Initializes a new instance of the <see cref="QueuesController" /> class.
         /// </summary>
         /// <param name="manager">The manager.</param>
-        public QeuesController(IManageQueues manager)
+        public QueuesController(IManageQueues manager)
         {
             _manager = manager;
         }
