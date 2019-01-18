@@ -158,6 +158,24 @@ namespace Aguacongas.RedisQueue
             }
         }
 
+        public async Task DeleteQueueAsync(string queueName)
+        {
+            var transaction = _database.CreateTransaction();
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            transaction.KeyDeleteAsync("queue/" + queueName);
+            transaction.KeyDeleteAsync("data/" + queueName);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+            await transaction.ExecuteAsync();
+
+        }
+
+        public Task<long> CountAsync(string queueName)
+        {
+            return _database.HashLengthAsync("data/" + queueName);
+        }
+
         private async Task<Message> Get(string fromQueueName, string id)
         {
             if (id == null)

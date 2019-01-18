@@ -1,5 +1,4 @@
 ﻿using Aguacongas.RedisQueue;
-using Aguacongas.RedisQueue.Authentication;
 using Aguacongas.RedisQueue.Template.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +10,6 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using System.Net.Http;
-using System.Security.Claims;
 
 namespace Aguacongas.RedisQueue.Template
 {
@@ -97,8 +95,9 @@ namespace Aguacongas.RedisQueue.Template
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddAuthentication(NoAuthenticationDefault.AuthenticationScheme)
-                .AddNoAuthentication();
+            // TODO: configure authentication
+            // services.AddAuthentication()
+            //    .AddCookie();
         }
 
         /// <summary>
@@ -124,7 +123,8 @@ namespace Aguacongas.RedisQueue.Template
                 {
                     c.SwaggerEndpoint($"/swagger/{Version}/swagger.json", "Aguacongas.RedisQueue");
                 })
-                .UseAuthentication()
+                // TODO: uncomment to use authentication
+                // .UseAuthentication()
                 .UseSignalR(options =>
                 {
                     options.MapHub<QueueHub>("/queues");

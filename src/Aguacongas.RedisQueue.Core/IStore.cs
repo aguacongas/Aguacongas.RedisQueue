@@ -64,7 +64,27 @@ namespace Aguacongas.RedisQueue
         /// <param name="message">The message.</param>
         /// <returns></returns>
         Task RemoveDataAsync(Message message);
+        /// <summary>
+        /// Gets the queue name list.
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<string> GetQueueNameList();
+        /// <summary>
+        /// Rebuilds the index.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
         void RebuildIndex(string queueName);
+        /// <summary>
+        /// Deletes the queue asynchronously.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
+        Task DeleteQueueAsync(string queueName);
+        /// <summary>
+        /// Counts the asynchronously.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
+        Task<long> CountAsync(string queueName);
     }
 }

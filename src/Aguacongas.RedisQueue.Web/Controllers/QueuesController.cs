@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Aguacongas.RedisQueue.Controllers
@@ -20,6 +21,7 @@ namespace Aguacongas.RedisQueue.Controllers
     [ApiController]
     public class QueuesController : ControllerBase
     {
+        private static Regex _isUri { get; } = new Regex("^(http|https)://");
         private readonly IManageQueues _manager;
 
         /// <summary>
@@ -46,7 +48,7 @@ namespace Aguacongas.RedisQueue.Controllers
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
         /// <returns>The 1st message in the queue</returns>
-        [HttpGet("{queueName}")]
+        [HttpGet("{*queueName}")]
         public async Task<Model.Message> Get(string queueName)
         {
             return (await _manager.DequeueAsync(queueName)).ToModel();
@@ -57,7 +59,7 @@ namespace Aguacongas.RedisQueue.Controllers
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
         /// <returns>The 1st message in the queue</returns>
-        [HttpGet("{queueName}/peek")]
+        [HttpGet("peek/{*queueName}")]
         public async Task<Model.Message> Peek(string queueName)
         {
             return (await _manager.PeekAsync(queueName)).ToModel();
@@ -69,7 +71,7 @@ namespace Aguacongas.RedisQueue.Controllers
         /// <param name="queueName">Name of the queue.</param>
         /// <param name="id">The identifier.</param>
         /// <returns>A message</returns>
-        [HttpGet("{queueName}/{id}")]
+        [HttpGet("{id}/{*queueName}")]
         public async Task<Model.Message> Read(string queueName, Guid id)
         {
             return (await _manager.GetAsync(id, queueName)).ToModel();
@@ -80,7 +82,7 @@ namespace Aguacongas.RedisQueue.Controllers
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
         /// <returns></returns>
-        [HttpGet("{queueName}/count")]
+        [HttpGet("count/{*queueName}")]
         public async Task<long> Count(string queueName)
         {
             return await _manager.GetCountAsync(queueName);
@@ -91,7 +93,7 @@ namespace Aguacongas.RedisQueue.Controllers
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
         /// <returns>The list of message identifier of specified queue</returns>
-        [HttpGet("{queueName}/ids")]
+        [HttpGet("ids/{*queueName}")]
         public async Task<IEnumerable<Guid>> GetIdList(string queueName)
         {
             return await _manager.GetKeysAsync(queueName);
@@ -135,9 +137,23 @@ namespace Aguacongas.RedisQueue.Controllers
             await _manager.EnqueueAsync(message.ToDto(GetInitiatorToken()));
         }
 
+        /// <summary>
+        /// Deletes the specified queue.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
+        [HttpDelete("{*queueName}")]
+        public async Task Delete([FromRoute] string queueName)
+        {
+            queueName = SanetizeDestination(queueName);
+
+            await _manager.DeleteQueueAsync(queueName);
+        }
+
         private static string SanetizeDestination(string destination)
         {
-            if (SubscriptionManager.IsRemote.IsMatch(destination))
+            destination = Uri.UnescapeDataString(destination);
+            if (!_isUri.IsMatch(destination) && SubscriptionManager.IsRemote.IsMatch(destination))
             {
                 destination = destination.Replace(":/", "://");
             }

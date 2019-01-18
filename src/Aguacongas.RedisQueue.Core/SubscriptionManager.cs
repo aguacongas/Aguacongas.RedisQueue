@@ -76,20 +76,33 @@ namespace Aguacongas.RedisQueue
             return manger.PublishAsync(id.ToString());
         }
 
+        /// <summary>
+        /// Subscribes to a queue events.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
         public void Subscribe(string queueName)
         {
             GetOrAddManager(queueName);
+        }
+
+        public void Unsubscribe(string queueName)
+        {
+            if(_managers.TryRemove(queueName, out ManagerBase manager))
+            {
+                manager.Stop();
+            }
+            _subscriber.Unsubscribe(queueName);
         }
 
         private ManagerBase GetOrAddManager(string address)
         {
             return _managers.GetOrAdd(address, c =>
             {
-                if (IsLocal(c))
+                    if (IsLocal(c))
                 {
                     return new LocalManager(address, _subscriber, _hubContext);
                 }
-                return new RemoteManager(address, _httpClient, _store, _subscriber, _logger);
+                return new RemoteManager(address, Handle, _httpClient, _store, _subscriber, _logger);
             });
         }
 
@@ -98,12 +111,21 @@ namespace Aguacongas.RedisQueue
             return !IsRemote.IsMatch(address);
         }
 
+        private async Task Handle(RedisChannel channel, RedisValue value)
+        {
+            var manager = GetOrAddManager(channel);
+            manager = await manager.Handle(value).ConfigureAwait(false);
+            _managers.AddOrUpdate(channel, manager, (c, m) => manager);
+        }
+
         abstract class ManagerBase
         {
             public string Address { get; set; }
             public abstract Task<ManagerBase> Handle(string value);
 
             public abstract Task PublishAsync(string id);
+
+            public abstract void Stop();
         }
 
         class LocalManager : ManagerBase
@@ -128,30 +150,31 @@ namespace Aguacongas.RedisQueue
             {
                 return Task.FromResult((ManagerBase)this);
             }
+
+            public override void Stop()
+            {
+            }
         }
 
         class RemoteManager: ManagerBase
         {
             private readonly IStore _store;
+            private readonly Func<RedisChannel, RedisValue, Task> _hanlder;
             private readonly ISubscriber _subscriber;
             private readonly ILogger<SubscriptionManager> _logger;
             private readonly HttpClient _httpClient;
 
-            public RemoteManager(string address, HttpClient httpClient, IStore store, ISubscriber subscriber, ILogger<SubscriptionManager> logger)
+            public RemoteManager(string address, Func<RedisChannel, RedisValue, Task> hanlder, HttpClient httpClient, IStore store, ISubscriber subscriber, ILogger<SubscriptionManager> logger)
             {
                 _httpClient = httpClient;
+                _hanlder = hanlder;
                 _store = store;
                 _subscriber = subscriber;
                 _logger = logger;
 
                 Address = address;
 
-                _subscriber.Subscribe(address, async (c, v) =>
-                {
-                    await Handle(v).ConfigureAwait(false);
-                });
-
-                Task.Run(() => Handle(null));
+                Start();
             }
 
             public override Task PublishAsync(string id)
@@ -166,13 +189,7 @@ namespace Aguacongas.RedisQueue
                 {
                     using (var request = new HttpRequestMessage(HttpMethod.Put, Address))
                     {
-                        if (!string.IsNullOrWhiteSpace(message.InitiatorToken))
-                        {
-                            var tokenInfos = message.InitiatorToken.Split(new char[' '], 2);
-                            request.Headers.Authorization = new AuthenticationHeaderValue(tokenInfos[0], tokenInfos[1]);
-                        }
-
-                        var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+                        var content = CreateContent(message, request);
                         request.Content = content;
 
                         try
@@ -202,15 +219,40 @@ namespace Aguacongas.RedisQueue
                 return this;
             }
 
+            public static StringContent CreateContent(Message message, HttpRequestMessage request)
+            {
+                if (!string.IsNullOrWhiteSpace(message.InitiatorToken))
+                {
+                    var tokenInfos = message.InitiatorToken.Split(new char[' '], 2);
+                    request.Headers.Authorization = new AuthenticationHeaderValue(tokenInfos[0], tokenInfos[1]);
+                }
+
+                var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+                return content;
+            }
+
+            public override void Stop()
+            {
+                _subscriber.Unsubscribe(Address);
+            }
+
             private async Task<ManagerBase> Requeue(Message message)
             {
                 _logger.LogWarning("Connexion to {Address} lost", Address);
 
-                await _store.RepushIndexAsync(message).ConfigureAwait(false);
-                return new RemoteFailManager(this, _subscriber, _store, _httpClient, _logger)
+                await _subscriber.UnsubscribeAsync(Address);
+                return new RemoteFailManager(this, message, _subscriber, _store, _httpClient, _logger)
                 {
                     Address = Address
                 };
+            }
+
+            public void Start()
+            {
+                _subscriber.Subscribe(Address, async (c, v) =>
+                {
+                    await _hanlder(c, v).ConfigureAwait(false);
+                });
             }
         }
 
@@ -221,13 +263,15 @@ namespace Aguacongas.RedisQueue
             private readonly IStore _store;
             private readonly HttpClient _httpClient;
             private readonly ILogger<SubscriptionManager> _logger;
+            private Message _message;
             private readonly Timer _timer;
 
             private ManagerBase _current;
 
-            public RemoteFailManager(RemoteManager parent, ISubscriber subscriber, IStore store, HttpClient httpClient, ILogger<SubscriptionManager> logger)
+            public RemoteFailManager(RemoteManager parent, Message message, ISubscriber subscriber, IStore store, HttpClient httpClient, ILogger<SubscriptionManager> logger)
             {
                 _parent = parent;
+                _message = message;
                 _subscriber = subscriber;
                 _store = store;
                 _httpClient = httpClient;
@@ -246,24 +290,43 @@ namespace Aguacongas.RedisQueue
                 return Task.FromResult(_current);
             }
 
+            public override void Stop()
+            {
+                _message = null;
+                _timer.Change(0, 0);
+                _timer.Dispose();
+            }
+
             private Timer StartPooling()
             {
                 return new Timer(async s =>
                 {
-                    var response = await _httpClient.GetAsync(Address);
-                    if (response.IsSuccessStatusCode)
+                    if (_message == null)
                     {
-                        _logger.LogInformation("Connexion to {Address} established", Address);
+                        return;
+                    }
 
-                        _current = _parent;
-                        // publish a queue event to reset the queue manager
-                        var message = await _store.PeekAsync(Address);
-                        if (message != null)
+                    using (var request = new HttpRequestMessage(HttpMethod.Put, Address))
+                    {
+                        var content = RemoteManager.CreateContent(_message, request);
+                        request.Content = content;
+
+                        try
                         {
-                            await _subscriber.PublishAsync(Address, message.Id.ToString());
-                        }
+                            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                _logger.LogInformation("Connexion to {Address} established", Address);
 
-                        _timer.Dispose();
+                                _current = _parent;
+                                // publish a queue event to reset the queue manager
+                                await _store.RemoveDataAsync(_message);
+                                _parent.Start();
+
+                                Stop();
+                            }
+                        }
+                        catch { }
                     }
                 }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
             }

@@ -1,4 +1,6 @@
 ﻿using Aguacongas.RedisQueue;
+using standalone.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -86,11 +88,16 @@ namespace standalone
                         policy.Requirements.Add(new RedisQueueRequirement());
                     });
                 })
+                .AddTransient<IAuthorizationHandler, CanUseQueuesHandler>()
                 .AddRedisQueue("localhost:6379")
                 .AddHttpClient()
                 .AddTransient(provider => provider.GetRequiredService<IHttpClientFactory>().CreateClient())
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            // TODO: configure authentication
+            // services.AddAuthentication()
+            //    .AddCookie();
         }
 
         /// <summary>
@@ -116,11 +123,14 @@ namespace standalone
                 {
                     c.SwaggerEndpoint($"/swagger/{Version}/swagger.json", "Aguacongas.RedisQueue");
                 })
+                // TODO: uncomment to use authentication
+                // .UseAuthentication()
                 .UseSignalR(options =>
                 {
                     options.MapHub<QueueHub>("/queues");
                 })
-                .UseMvc();
+                .UseMvc()
+                .UseRedisQueue();
         }
     }
 }

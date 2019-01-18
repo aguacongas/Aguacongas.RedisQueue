@@ -102,10 +102,9 @@ namespace Aguacongas.RedisQueue
             return GetData(message);
         }
 
-        public async Task<long> GetCountAsync(string queueName)
+        public Task<long> GetCountAsync(string queueName)
         {
-            var keys = await _store.GetKeysAsync(queueName);
-            return keys.Count();
+            return _store.CountAsync(queueName);
         }
 
 
@@ -117,6 +116,9 @@ namespace Aguacongas.RedisQueue
         public Task<IEnumerable<Guid>> GetKeysAsync(string queueName) => _store.GetKeysAsync(queueName);
 
 
+        /// <summary>
+        /// Rebuilds the indexes and subscribe.
+        /// </summary>
         public void RebuildIndexesAndSubscribe()
         {
             var queues = _store.GetQueueNameList();
@@ -125,6 +127,17 @@ namespace Aguacongas.RedisQueue
                 _store.RebuildIndex(queueName);
                 _subscriptionManager.Subscribe(queueName);
             }
+        }
+
+        /// <summary>
+        /// Deletes the queue asynchronously.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
+        public async Task DeleteQueueAsync(string queueName)
+        {
+            await _store.DeleteQueueAsync(queueName);
+            _subscriptionManager.Unsubscribe(queueName);
         }
 
         private static Message GetData(Message message)
