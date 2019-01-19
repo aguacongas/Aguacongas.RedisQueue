@@ -73,11 +73,23 @@ namespace Aguacongas.RedisQueue
         Task<long> GetCountAsync(string queueName);
 
         /// <summary>
+        /// Rebuilds the indexes and subscribe.
+        /// </summary>
+        void RebuildIndexesAndSubscribe();
+
+        /// <summary>
         ///   Gets the queues names.
         /// </summary>
         /// <value>
         ///   The queues names.
         /// </value>
         IEnumerable<string> Queues { get; }
+
+        /// <summary>
+        /// Deletes the queue asynchronously.
+        /// </summary>
+        /// <param name="queueName">Name of the queue.</param>
+        /// <returns></returns>
+        Task DeleteQueueAsync(string queueName);
     }
 }

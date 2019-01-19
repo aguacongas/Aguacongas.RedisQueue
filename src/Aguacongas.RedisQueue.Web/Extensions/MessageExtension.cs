@@ -17,6 +17,10 @@ namespace Aguacongas.RedisQueue.Extensions
         /// <returns></returns>
         public static Message ToDto(this Model.Message message, string initiatorToken)
         {
+            if (message == null)
+            {
+                return null;
+            }
             return new Message
             {
                 Content = message.Content,
@@ -34,6 +38,10 @@ namespace Aguacongas.RedisQueue.Extensions
         /// <returns></returns>
         public static Model.Message ToModel(this Message message)
         {
+            if (message == null)
+            {
+                return null;
+            }
             return new Model.Message
             {
                 Content = message.Content,

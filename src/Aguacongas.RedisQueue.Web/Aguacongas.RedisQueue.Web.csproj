@@ -34,4 +34,10 @@ Contain MVC API to manage queues</Description>
     <ProjectReference Include="..\Aguacongas.RedisQueue.Core\Aguacongas.RedisQueue.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Aguacongas.RedisQueue.Web.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

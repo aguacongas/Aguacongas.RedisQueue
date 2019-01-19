@@ -16,7 +16,7 @@ namespace Aguacongas.RedisQueue.Web.Test
         public  async Task Post_should_sanatize_queue_name()
         {
             Mock<IManageQueues> queueManagerMock;
-            QeuesController sut;
+            QueuesController sut;
             CreateSut(out queueManagerMock, out sut);
 
             await sut.Post("http:/test", "test");
@@ -28,7 +28,7 @@ namespace Aguacongas.RedisQueue.Web.Test
         public async Task Put_should_sanatize_queue_name()
         {
             Mock<IManageQueues> queueManagerMock;
-            QeuesController sut;
+            QueuesController sut;
             CreateSut(out queueManagerMock, out sut);
 
             await sut.Put("test", new Model.Message
@@ -44,7 +44,7 @@ namespace Aguacongas.RedisQueue.Web.Test
             queueManagerMock.Verify(m => m.EnqueueAsync(It.Is<Message>(msg => msg.QueueName == "https://test")));
         }
 
-        private static void CreateSut(out Mock<IManageQueues> queueManagerMock, out QeuesController sut)
+        private static void CreateSut(out Mock<IManageQueues> queueManagerMock, out QueuesController sut)
         {
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["Authorization"] = "test test";
@@ -58,7 +58,7 @@ namespace Aguacongas.RedisQueue.Web.Test
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
-            sut = new QeuesController(queueManagerMock.Object)
+            sut = new QueuesController(queueManagerMock.Object)
             {
                 ControllerContext = controllerContext
             };

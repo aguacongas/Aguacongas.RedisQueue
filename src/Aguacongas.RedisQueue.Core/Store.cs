@@ -1,6 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Aguacongas.RedisQueue
@@ -121,6 +122,58 @@ namespace Aguacongas.RedisQueue
         public Task RemoveDataAsync(Message message)
         {
             return _database.HashDeleteAsync("data/" + message.QueueName, message.Id.ToString());
+        }
+
+        public IEnumerable<string> GetQueueNameList()
+        {
+            var endpoints = _database.Multiplexer.GetEndPoints();
+            var keyList = new List<RedisKey>();
+            foreach(var endpoint in endpoints)
+            {
+                var server = _database.Multiplexer.GetServer(endpoint);
+                var keys = server.Keys(_database.Database, "data/*");
+                keyList.AddRange(keys);
+            }
+
+            return keyList.Distinct().Select(key => ((string)key).Split(new char[] { '/' }, 2)[1]);
+        }
+
+        public void RebuildIndex(string queueName)
+        {
+            var indexKey = "queue/" + queueName;
+            var dataKey = "data/" + queueName;
+            var indexCount = _database.ListLength(indexKey);
+            var dataCount = _database.HashLength(dataKey);
+            if (dataCount > indexCount)
+            {
+                var dataKeys = _database.HashKeys(dataKey);
+                var indexKeys = _database.ListRange(indexKey);
+                foreach(var key in dataKeys)
+                {
+                    if (!indexKeys.Any(k => k == key))
+                    {
+                        _database.ListRightPush(indexKey, key);
+                    }
+                }
+            }
+        }
+
+        public async Task DeleteQueueAsync(string queueName)
+        {
+            var transaction = _database.CreateTransaction();
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            transaction.KeyDeleteAsync("queue/" + queueName);
+            transaction.KeyDeleteAsync("data/" + queueName);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+            await transaction.ExecuteAsync();
+
+        }
+
+        public Task<long> CountAsync(string queueName)
+        {
+            return _database.HashLengthAsync("data/" + queueName);
         }
 
         private async Task<Message> Get(string fromQueueName, string id)
