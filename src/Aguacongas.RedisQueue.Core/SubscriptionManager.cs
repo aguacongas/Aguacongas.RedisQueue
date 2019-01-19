@@ -142,9 +142,8 @@ namespace Aguacongas.RedisQueue
 
             public async override Task PublishAsync(string id)
             {
-                await _subscriber.PublishAsync(Address, id);
-                await _hubContext.Clients.Group(Address)
-                    .SendAsync("newMessage", id);
+                await Task.WhenAll(_subscriber.PublishAsync(Address, id), _hubContext.Clients.Group(Address)
+                    .SendAsync("newMessage", id));
             }
             public override Task<ManagerBase> Handle(string value)
             {

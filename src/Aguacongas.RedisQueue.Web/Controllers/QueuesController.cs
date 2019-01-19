@@ -48,7 +48,7 @@ namespace Aguacongas.RedisQueue.Controllers
         /// </summary>
         /// <param name="queueName">Name of the queue.</param>
         /// <returns>The 1st message in the queue</returns>
-        [HttpGet("{*queueName}")]
+        [HttpGet("pop/{*queueName}")]
         public async Task<Model.Message> Get(string queueName)
         {
             return (await _manager.DequeueAsync(queueName)).ToModel();
@@ -71,7 +71,7 @@ namespace Aguacongas.RedisQueue.Controllers
         /// <param name="queueName">Name of the queue.</param>
         /// <param name="id">The identifier.</param>
         /// <returns>A message</returns>
-        [HttpGet("{id}/{*queueName}")]
+        [HttpGet("get/{id}/{*queueName}")]
         public async Task<Model.Message> Read(string queueName, Guid id)
         {
             return (await _manager.GetAsync(id, queueName)).ToModel();
