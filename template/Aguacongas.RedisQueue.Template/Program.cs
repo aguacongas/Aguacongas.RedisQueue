@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Aguacongas.RedisQueue.Template
 {
@@ -24,6 +27,15 @@ namespace Aguacongas.RedisQueue.Template
         /// <returns></returns>
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                // TODO configure  logging
+                .ConfigureLogging((hostingContext, builder) =>
+                {
+                    builder.ClearProviders();
+                    builder.AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
+                        .AddFilter<ConsoleLoggerProvider>(logLevel => logLevel >= LogLevel.Warning && logLevel != LogLevel.None)
+                        .AddConsole();
+                });
+
     }
 }
