@@ -51,6 +51,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("pop/{*queueName}")]
         public async Task<Model.Message> Get(string queueName)
         {
+            queueName = SanetizeDestination(queueName);
             return (await _manager.DequeueAsync(queueName)).ToModel();
         }
 
@@ -62,7 +63,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("peek/{*queueName}")]
         public async Task<Model.Message> Peek(string queueName)
         {
-            return (await _manager.PeekAsync(queueName)).ToModel();
+            return (await _manager.PeekAsync(SanetizeDestination(queueName))).ToModel();
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("get/{id}/{*queueName}")]
         public async Task<Model.Message> Read(string queueName, Guid id)
         {
-            return (await _manager.GetAsync(id, queueName)).ToModel();
+            return (await _manager.GetAsync(id, SanetizeDestination(queueName))).ToModel();
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("count/{*queueName}")]
         public async Task<long> Count(string queueName)
         {
-            return await _manager.GetCountAsync(queueName);
+            return await _manager.GetCountAsync(SanetizeDestination(queueName));
         }
 
         /// <summary>
@@ -96,7 +97,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("ids/{*queueName}")]
         public async Task<IEnumerable<Guid>> GetIdList(string queueName)
         {
-            return await _manager.GetKeysAsync(queueName);
+            return await _manager.GetKeysAsync(SanetizeDestination(queueName));
         }
 
         /// <summary>
@@ -131,9 +132,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpPut("{*destination}")]
         public async Task Put([FromRoute] string destination, [FromBody][Required] Model.Message message)
         {
-            destination = SanetizeDestination(destination);
-
-            message.QueueName = destination;
+            message.QueueName = SanetizeDestination(destination);
             await _manager.EnqueueAsync(message.ToDto(GetInitiatorToken()));
         }
 
@@ -145,9 +144,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpDelete("{*queueName}")]
         public async Task Delete([FromRoute] string queueName)
         {
-            queueName = SanetizeDestination(queueName);
-
-            await _manager.DeleteQueueAsync(queueName);
+            await _manager.DeleteQueueAsync(SanetizeDestination(queueName));
         }
 
         private static string SanetizeDestination(string destination)
