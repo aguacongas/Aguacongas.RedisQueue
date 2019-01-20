@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
-namespace standalone.Authorization
+namespace server.Authorization
 {
     /// <summary>
     /// Can use queues authorization handler

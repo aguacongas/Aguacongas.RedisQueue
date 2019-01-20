@@ -1,5 +1,5 @@
 ﻿using Aguacongas.RedisQueue;
-using standalone.Authorization;
+using server.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using System.Net.Http;
 
-namespace standalone
+namespace server
 {
     /// <summary>
     /// 
@@ -52,7 +52,6 @@ namespace standalone
         /// <param name="services">The services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            var database = Configuration.GetValue<int>("Database");
             services
                 .AddSwaggerGen(c =>
                 {
@@ -90,7 +89,7 @@ namespace standalone
                     });
                 })
                 .AddTransient<IAuthorizationHandler, CanUseQueuesHandler>()
-                .AddRedisQueue("localhost:6379", database)
+                .AddRedisQueue("localhost:6379")
                 .AddHttpClient()
                 .AddTransient(provider => provider.GetRequiredService<IHttpClientFactory>().CreateClient())
                 .AddMvc()

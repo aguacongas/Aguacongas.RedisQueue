@@ -2,11 +2,20 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Aguacongas.RedisQueue</id>
-    <version>1.0.0</version>
-    <description>
-      Creates Aguacongas.RedisQueue projects
-    </description>
+    <version>$version$</version>
     <authors>Olivier Lefebvre</authors>
+    <owners>Olivier Lefebvre</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/aguacongas/Aguacongas.RedisQueue/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/aguacongas/Aguacongas.RedisQueue</projectUrl>
+    <description>
+      ASP.Net Core MCV API library to manage queues hosted by redis.
+
+      Contain MVC API to manage queues
+    </description>
+    <copyright>Copyright (c) 2018 @Olivier Lefebvre</copyright>
+    <tags>aspnetcore queue redis template</tags>
+    <repository type="git" url="https://github.com/aguacongas/Aguacongas.RedisQueue" />
     <packageTypes>
       <packageType name="Template" />
     </packageTypes>

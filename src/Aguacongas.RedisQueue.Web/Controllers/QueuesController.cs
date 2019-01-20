@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -104,16 +106,15 @@ namespace Aguacongas.RedisQueue.Controllers
         /// Creates a new message with the serialized value and queue it to the specified destination.
         /// </summary>
         /// <param name="destination">The destination.</param>
-        /// <param name="serializedContent">The serialized value.</param>
+        /// <param name="content">The serialized content.</param>
         /// <returns>The message identifier</returns>
         [HttpPost("{*destination}")]
-        public async Task<Guid> Post([FromRoute] string destination, [FromBody][Required] string serializedContent)
+        public async Task<Guid> Post([FromRoute] string destination, [FromBody][Required] object content)
         {
             destination = SanetizeDestination(destination);
-
             var message = new Message
             {
-                Content = serializedContent,
+                Content = content,
                 QueueName = destination,
                 InitiatorToken = GetInitiatorToken()
             };
