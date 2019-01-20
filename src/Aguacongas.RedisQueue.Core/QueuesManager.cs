@@ -65,9 +65,9 @@ namespace Aguacongas.RedisQueue
             {
                 throw new InvalidOperationException("The message queue name cannot be empty");
             }
-            if (string.IsNullOrEmpty(message.Content))
+            if (message.Content == null)
             {
-                throw new InvalidOperationException("The message payload cannot be empty");
+                throw new InvalidOperationException("The message payload cannot be null");
             }
             message.Created = DateTimeOffset.Now;
             await _store.PushAsync(message).ConfigureAwait(false);

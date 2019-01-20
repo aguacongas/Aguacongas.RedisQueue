@@ -52,6 +52,7 @@ namespace Aguacongas.RedisQueue.Template
         /// <param name="services">The services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            var database = Configuration.GetValue<int>("Database");
             services
                 .AddSwaggerGen(c =>
                 {
@@ -89,7 +90,7 @@ namespace Aguacongas.RedisQueue.Template
                     });
                 })
                 .AddTransient<IAuthorizationHandler, CanUseQueuesHandler>()
-                .AddRedisQueue("localhost:6379")
+                .AddRedisQueue("localhost:6379", database)
                 .AddHttpClient()
                 .AddTransient(provider => provider.GetRequiredService<IHttpClientFactory>().CreateClient())
                 .AddMvc()

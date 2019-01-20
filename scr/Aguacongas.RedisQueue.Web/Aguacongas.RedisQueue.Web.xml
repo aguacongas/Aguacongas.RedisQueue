@@ -64,12 +64,12 @@
             <param name="queueName">Name of the queue.</param>
             <returns>The list of message identifier of specified queue</returns>
         </member>
-        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Post(System.String,System.String)">
+        <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Post(System.String,System.Object)">
             <summary>
             Creates a new message with the serialized value and queue it to the specified destination.
             </summary>
             <param name="destination">The destination.</param>
-            <param name="serializedContent">The serialized value.</param>
+            <param name="content">The serialized content.</param>
             <returns>The message identifier</returns>
         </member>
         <member name="M:Aguacongas.RedisQueue.Controllers.QueuesController.Put(System.String,Aguacongas.RedisQueue.Model.Message)">

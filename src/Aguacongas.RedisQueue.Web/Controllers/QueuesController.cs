@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -51,6 +53,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("pop/{*queueName}")]
         public async Task<Model.Message> Get(string queueName)
         {
+            queueName = SanetizeDestination(queueName);
             return (await _manager.DequeueAsync(queueName)).ToModel();
         }
 
@@ -62,7 +65,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("peek/{*queueName}")]
         public async Task<Model.Message> Peek(string queueName)
         {
-            return (await _manager.PeekAsync(queueName)).ToModel();
+            return (await _manager.PeekAsync(SanetizeDestination(queueName))).ToModel();
         }
 
         /// <summary>
@@ -74,7 +77,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("get/{id}/{*queueName}")]
         public async Task<Model.Message> Read(string queueName, Guid id)
         {
-            return (await _manager.GetAsync(id, queueName)).ToModel();
+            return (await _manager.GetAsync(id, SanetizeDestination(queueName))).ToModel();
         }
 
         /// <summary>
@@ -85,7 +88,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("count/{*queueName}")]
         public async Task<long> Count(string queueName)
         {
-            return await _manager.GetCountAsync(queueName);
+            return await _manager.GetCountAsync(SanetizeDestination(queueName));
         }
 
         /// <summary>
@@ -96,23 +99,22 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpGet("ids/{*queueName}")]
         public async Task<IEnumerable<Guid>> GetIdList(string queueName)
         {
-            return await _manager.GetKeysAsync(queueName);
+            return await _manager.GetKeysAsync(SanetizeDestination(queueName));
         }
 
         /// <summary>
         /// Creates a new message with the serialized value and queue it to the specified destination.
         /// </summary>
         /// <param name="destination">The destination.</param>
-        /// <param name="serializedContent">The serialized value.</param>
+        /// <param name="content">The serialized content.</param>
         /// <returns>The message identifier</returns>
         [HttpPost("{*destination}")]
-        public async Task<Guid> Post([FromRoute] string destination, [FromBody][Required] string serializedContent)
+        public async Task<Guid> Post([FromRoute] string destination, [FromBody][Required] object content)
         {
             destination = SanetizeDestination(destination);
-
             var message = new Message
             {
-                Content = serializedContent,
+                Content = content,
                 QueueName = destination,
                 InitiatorToken = GetInitiatorToken()
             };
@@ -131,9 +133,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpPut("{*destination}")]
         public async Task Put([FromRoute] string destination, [FromBody][Required] Model.Message message)
         {
-            destination = SanetizeDestination(destination);
-
-            message.QueueName = destination;
+            message.QueueName = SanetizeDestination(destination);
             await _manager.EnqueueAsync(message.ToDto(GetInitiatorToken()));
         }
 
@@ -145,9 +145,7 @@ namespace Aguacongas.RedisQueue.Controllers
         [HttpDelete("{*queueName}")]
         public async Task Delete([FromRoute] string queueName)
         {
-            queueName = SanetizeDestination(queueName);
-
-            await _manager.DeleteQueueAsync(queueName);
+            await _manager.DeleteQueueAsync(SanetizeDestination(queueName));
         }
 
         private static string SanetizeDestination(string destination)
