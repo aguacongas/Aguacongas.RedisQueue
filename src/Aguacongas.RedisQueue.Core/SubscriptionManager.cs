@@ -102,20 +102,13 @@ namespace Aguacongas.RedisQueue
                 {
                     return new LocalManager(address, _subscriber, _hubContext);
                 }
-                return new RemoteManager(address, Handle, _httpClient, _store, _subscriber, _logger);
+                return new RemoteManager(address, _httpClient, _store, _subscriber, _logger);
             });
         }
 
         private bool IsLocal(string address)
         {
             return !IsRemote.IsMatch(address);
-        }
-
-        private async Task Handle(RedisChannel channel, RedisValue value)
-        {
-            var manager = GetOrAddManager(channel);
-            manager = await manager.Handle(value).ConfigureAwait(false);
-            _managers.AddOrUpdate(channel, manager, (c, m) => manager);
         }
 
         abstract class ManagerBase
@@ -158,63 +151,35 @@ namespace Aguacongas.RedisQueue
         class RemoteManager: ManagerBase
         {
             private readonly IStore _store;
-            private readonly Func<RedisChannel, RedisValue, Task> _hanlder;
             private readonly ISubscriber _subscriber;
             private readonly ILogger<SubscriptionManager> _logger;
             private readonly HttpClient _httpClient;
+            ManagerBase _state;
 
-            public RemoteManager(string address, Func<RedisChannel, RedisValue, Task> hanlder, HttpClient httpClient, IStore store, ISubscriber subscriber, ILogger<SubscriptionManager> logger)
+            public RemoteManager(string address, HttpClient httpClient, IStore store, ISubscriber subscriber, ILogger<SubscriptionManager> logger)
             {
                 _httpClient = httpClient;
-                _hanlder = hanlder;
                 _store = store;
                 _subscriber = subscriber;
                 _logger = logger;
 
                 Address = address;
 
-                Start();
+                _state = new RemoteOkState(this, address, httpClient, store, subscriber, logger);
+                _subscriber.Subscribe(Address, async (c, v) =>
+                {
+                    await Handle(c).ConfigureAwait(false);
+                });
             }
 
             public override Task PublishAsync(string id)
             {
-                return _subscriber.PublishAsync(Address, id);
+                return _state.PublishAsync(id);
             }
 
             public override async Task<ManagerBase> Handle(string value)
-            {               
-                Message message;
-                while((message = await _store.PopIndexAsync(Address).ConfigureAwait(false)) != null)
-                {
-                    using (var request = new HttpRequestMessage(HttpMethod.Put, Address))
-                    {
-                        var content = CreateContent(message, request);
-                        request.Content = content;
-
-                        try
-                        {
-                            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-                            if (!response.IsSuccessStatusCode)
-                            {
-                                if (response.StatusCode != HttpStatusCode.Unauthorized || response.StatusCode != HttpStatusCode.Forbidden)
-                                {
-                                    return await Requeue(message);
-                                }
-                                else
-                                {
-                                    _logger.LogError("Send message {MessageId} to {Address} {StatusCode}", message.Id, Address, response.StatusCode);
-                                }
-                            }
-
-                            await _store.RemoveDataAsync(message).ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            return await Requeue(message);
-                        }
-                    }
-
-                }
+            {
+                _state = await _state.Handle(value);
                 return this;
             }
 
@@ -233,101 +198,156 @@ namespace Aguacongas.RedisQueue
             public override void Stop()
             {
                 _subscriber.Unsubscribe(Address);
+                _state.Stop();
             }
 
-            private async Task<ManagerBase> Requeue(Message message)
+            class RemoteOkState : ManagerBase
             {
-                _logger.LogWarning("Connexion to {Address} lost", Address);
+                private readonly RemoteManager _parent;
+                private HttpClient _httpClient;
+                private IStore _store;
+                private ISubscriber _subscriber;
+                private ILogger<SubscriptionManager> _logger;
 
-                await _subscriber.UnsubscribeAsync(Address);
-                return new RemoteFailManager(this, message, _subscriber, _store, _httpClient, _logger)
+                public RemoteOkState(RemoteManager parent, string address, HttpClient httpClient, IStore store, ISubscriber subscriber, ILogger<SubscriptionManager> logger)
                 {
-                    Address = Address
-                };
-            }
+                    _parent = parent;
+                    Address = address;
+                    _httpClient = httpClient;
+                    _store = store;
+                    _subscriber = subscriber;
+                    _logger = logger;
+                }
 
-            public void Start()
-            {
-                _subscriber.Subscribe(Address, async (c, v) =>
+                public override async Task<ManagerBase> Handle(string value)
                 {
-                    await _hanlder(c, v).ConfigureAwait(false);
-                });
-            }
-        }
-
-        class RemoteFailManager: ManagerBase
-        {
-            private readonly RemoteManager _parent;
-            private readonly ISubscriber _subscriber;
-            private readonly IStore _store;
-            private readonly HttpClient _httpClient;
-            private readonly ILogger<SubscriptionManager> _logger;
-            private Message _message;
-            private readonly Timer _timer;
-
-            private ManagerBase _current;
-
-            public RemoteFailManager(RemoteManager parent, Message message, ISubscriber subscriber, IStore store, HttpClient httpClient, ILogger<SubscriptionManager> logger)
-            {
-                _parent = parent;
-                _message = message;
-                _subscriber = subscriber;
-                _store = store;
-                _httpClient = httpClient;
-                _logger = logger;
-
-                _timer = StartPooling();
-                _current = this;
-            }
-
-            public override Task PublishAsync(string id)
-            {
-                return Task.CompletedTask;
-            }
-            public override Task<ManagerBase> Handle(string value)
-            {
-                return Task.FromResult(_current);
-            }
-
-            public override void Stop()
-            {
-                _message = null;
-                _timer.Change(0, 0);
-                _timer.Dispose();
-            }
-
-            private Timer StartPooling()
-            {
-                return new Timer(async s =>
-                {
-                    if (_message == null)
+                    Message message;
+                    while ((message = await _store.PopIndexAsync(Address).ConfigureAwait(false)) != null)
                     {
-                        return;
-                    }
-
-                    using (var request = new HttpRequestMessage(HttpMethod.Put, Address))
-                    {
-                        var content = RemoteManager.CreateContent(_message, request);
-                        request.Content = content;
-
-                        try
+                        using (var request = new HttpRequestMessage(HttpMethod.Put, Address))
                         {
-                            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-                            if (response.IsSuccessStatusCode)
+                            var content = CreateContent(message, request);
+                            request.Content = content;
+
+                            try
                             {
-                                _logger.LogInformation("Connexion to {Address} established", Address);
+                                var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                                if (!response.IsSuccessStatusCode)
+                                {
+                                    if (response.StatusCode != HttpStatusCode.Unauthorized || response.StatusCode != HttpStatusCode.Forbidden)
+                                    {
+                                        return Requeue(message);
+                                    }
+                                    else
+                                    {
+                                        _logger.LogError("Send message {MessageId} to {Address} {StatusCode}", message.Id, Address, response.StatusCode);
+                                    }
+                                }
 
-                                _current = _parent;
-                                // publish a queue event to reset the queue manager
-                                await _store.RemoveDataAsync(_message);
-                                _parent.Start();
-
-                                Stop();
+                                await _store.RemoveDataAsync(message).ConfigureAwait(false);
+                            }
+                            catch
+                            {
+                                return Requeue(message);
                             }
                         }
-                        catch { }
+
                     }
-                }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+                    return this;
+                }
+
+                public override Task PublishAsync(string id)
+                {
+                    return _subscriber.PublishAsync(Address, id);
+                }
+
+                public override void Stop()
+                {
+                    _subscriber.Unsubscribe(Address);
+                }
+
+                private ManagerBase Requeue(Message message)
+                {
+                    _logger.LogWarning("Connexion to {Address} lost", Address);
+                    return new RemoteFailState(_parent, message, _subscriber, _store, _httpClient, _logger)
+                    {
+                        Address = Address
+                    };
+                }
+            }
+
+            class RemoteFailState : ManagerBase
+            {
+                private readonly RemoteManager _parent;
+                private readonly ISubscriber _subscriber;
+                private readonly IStore _store;
+                private readonly HttpClient _httpClient;
+                private readonly ILogger<SubscriptionManager> _logger;
+                private Message _message;
+                private readonly Timer _timer;
+
+                private ManagerBase _current;
+
+                public RemoteFailState(RemoteManager parent, Message message, ISubscriber subscriber, IStore store, HttpClient httpClient, ILogger<SubscriptionManager> logger)
+                {
+                    _parent = parent;
+                    _message = message;
+                    _subscriber = subscriber;
+                    _store = store;
+                    _httpClient = httpClient;
+                    _logger = logger;
+
+                    _timer = StartPooling();
+                    _current = this;
+                }
+
+                public override Task PublishAsync(string id)
+                {
+                    return Task.CompletedTask;
+                }
+                public override Task<ManagerBase> Handle(string value)
+                {
+                    return Task.FromResult(_current);
+                }
+
+                public override void Stop()
+                {
+                    _message = null;
+                    _timer.Change(0, 0);
+                    _timer.Dispose();
+                }
+
+                private Timer StartPooling()
+                {
+                    return new Timer(async s =>
+                    {
+                        if (_message == null)
+                        {
+                            return;
+                        }
+
+                        using (var request = new HttpRequestMessage(HttpMethod.Put, Address))
+                        {
+                            var content = CreateContent(_message, request);
+                            request.Content = content;
+
+                            try
+                            {
+                                var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    _logger.LogInformation("Connexion to {Address} established", Address);
+
+                                    _current = _parent;
+                                    await _store.RemoveDataAsync(_message);
+
+                                    Stop();
+                                }
+                            }
+                            catch { }
+                        }
+                    }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+                }
             }
         }
     }

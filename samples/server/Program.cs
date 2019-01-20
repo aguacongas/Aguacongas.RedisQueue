@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 
-namespace standalone
+namespace server
 {
     /// <summary>
     /// 
@@ -28,6 +28,7 @@ namespace standalone
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                // TODO configure  logging
                 .ConfigureLogging((hostingContext, builder) =>
                 {
                     builder.ClearProviders();
@@ -35,5 +36,6 @@ namespace standalone
                         .AddFilter<ConsoleLoggerProvider>(logLevel => logLevel >= LogLevel.Warning && logLevel != LogLevel.None)
                         .AddConsole();
                 });
+
     }
 }

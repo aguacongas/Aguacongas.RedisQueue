@@ -19,7 +19,7 @@ namespace Aguacongas.RedisQueue.Web.Test
             QueuesController sut;
             CreateSut(out queueManagerMock, out sut);
 
-            await sut.Post("http:/test", "test");
+            await sut.Post("http:/test", "\"test\"");
 
             queueManagerMock.Verify(m => m.EnqueueAsync(It.Is<Message>(msg => msg.QueueName == "http://test")));
         }

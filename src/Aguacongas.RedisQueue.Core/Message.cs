@@ -41,6 +41,6 @@ namespace Aguacongas.RedisQueue
         /// <value>
         /// The content.
         /// </value>
-        public string Content{ get; set; }
+        public object Content{ get; set; }
     }   
 }
