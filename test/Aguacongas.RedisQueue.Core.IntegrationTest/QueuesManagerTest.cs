@@ -99,6 +99,29 @@ namespace Aguacongas.RedisQueue.Core.IntegrationTest
             Assert.Equal(0, count);
         }
 
+        [Fact]
+        public async Task RebuildIndexesAndSubscribe_should_rebuild_indexes()
+        {
+            var store = _fixture.Provider.GetRequiredService<IStore>();
+
+            var expected = new Message
+            {
+                QueueName = Guid.NewGuid().ToString(),
+                Content = "test"
+            };
+
+            await store.PushAsync(expected);
+            await store.PopIndexAsync(expected.QueueName);
+
+            var sut = GetSut();
+
+            sut.RebuildIndexesAndSubscribe();
+
+            var message = await sut.DequeueAsync(expected.QueueName);
+
+            Assert.NotNull(message);
+            Assert.Equal(expected.Id, message.Id);
+        }
 
 
         private IManageQueues GetSut()

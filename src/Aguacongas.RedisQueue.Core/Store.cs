@@ -100,8 +100,18 @@ namespace Aguacongas.RedisQueue
         /// <returns></returns>
         public async Task<Message> PopIndexAsync(string fromQueueName)
         {
-            string id = await _database.ListLeftPopAsync("queue/" + fromQueueName);
-            return await Get(fromQueueName, id);
+            Message message;
+            do
+            {
+                string id = await _database.ListLeftPopAsync("queue/" + fromQueueName);
+                if (id == null)
+                {
+                    return null;
+                }
+                message = await GetData(fromQueueName, id);
+            } while (message == null); // in a load balancing scenario a rebuild index can push a message index while it's processed by a subscription manager.
+
+            return message;
         }
 
         /// <summary>
@@ -152,7 +162,8 @@ namespace Aguacongas.RedisQueue
                 {
                     if (!indexKeys.Any(k => k == key))
                     {
-                        _database.ListRightPush(indexKey, key);
+                        // set on top
+                        _database.ListLeftPush(indexKey, key);
                     }
                 }
             }
@@ -183,6 +194,11 @@ namespace Aguacongas.RedisQueue
                 return null;
             }
 
+            return await GetData(fromQueueName, id);
+        }
+
+        private async Task<Message> GetData(string fromQueueName, string id)
+        {
             string message = await _database.HashGetAsync("data/" + fromQueueName, id);
             if (message != null)
             {
