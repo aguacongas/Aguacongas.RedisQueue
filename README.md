@@ -44,6 +44,8 @@ dotnet new redisqueue
 
 Then configure it with authorization that meet your requirement.
 
+Read the [wiki](https://github.com/aguacongas/Aguacongas.RedisQueue/wiki) to know more about how to use it.
+
 ## Build
 
 To build the project from source code run `build.cmd` or `build.ps1`
